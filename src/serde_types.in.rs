@@ -40,30 +40,68 @@ pub mod jsonapi {
 
     #[derive(Serialize, Deserialize, Debug)]
     pub struct ErrorSource {
-        pointer: Option<String>,
-        parameter: Option<String>,
+        pub pointer: Option<String>,
+        pub parameter: Option<String>,
     }
 
     #[derive(Serialize, Deserialize, Debug)]
     pub struct Error {
-        id: String,
-        links: Links,
-        status: String,
-        code: String,
-        title: String,
-        detail: String,
-        source: ErrorSource,
-        meta: Meta,
+        pub id: String,
+        pub links: Links,
+        pub status: String,
+        pub code: String,
+        pub title: String,
+        pub detail: String,
+        pub source: ErrorSource,
+        pub meta: Meta,
     }
 
     pub type Errors = Vec<Error>;
+
+    #[derive(Serialize, Deserialize, Debug)]
+    pub struct Pagination {
+        pub first: Option<String>,
+        pub prev: Option<String>,
+        pub next: Option<String>,
+        pub last: Option<String>,
+    }
+
+    impl Pagination {
+        pub fn has_first(&self) -> bool {
+            !self.first.is_none()
+        }
+        pub fn has_prev(&self) -> bool {
+            !self.prev.is_none()
+        }
+        pub fn has_next(&self) -> bool {
+            !self.next.is_none()
+        }
+        pub fn has_last(&self) -> bool {
+            !self.last.is_none()
+        }
+    }
 
     // Spec says at least one of data, errors, meta
     // data and errors must not co-exist
     #[derive(Serialize, Deserialize, Debug)]
     pub struct Document {
-        data: Option<PrimaryData>,
-        errors: Option<Errors>,
-        meta: Option<Meta>,
+        pub data: Option<PrimaryData>,
+        pub errors: Option<Errors>,
+        pub meta: Option<Meta>,
+    }
+
+    impl Document {
+        pub fn has_errors(&self) -> bool {
+            !self.errors.is_none()
+        }
+        pub fn has_data(&self) -> bool {
+            !self.data.is_none()
+        }
+        pub fn has_meta(&self) -> bool {
+            !self.meta.is_none()
+        }
+        pub fn is_valid(&self) -> bool {
+            self.has_data() ^ self.has_errors()
+        }
     }
 }
