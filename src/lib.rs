@@ -8,6 +8,7 @@ mod tests {
     use super::*;
 
     use serde_json;
+
     #[test]
     fn it_works() {
         let resource = Resource {
@@ -36,4 +37,45 @@ mod tests {
         assert_eq!(document.is_valid(), false);
 
     }
+
+    #[test]
+    fn document_can_be_valid() {
+        let resource = Resource {
+            _type: format!("test"),
+            id: format!("123"),
+            attributes: ResourceAttributes::new(),
+            relationships: Relationships::new(),
+            links: Links::new(),
+        };
+
+        let errors = Errors::new();
+
+        let invalid_document = Document {
+            data: None,
+            errors: None,
+            meta: None,
+        };
+
+        assert_eq!(invalid_document.is_valid(), false);
+
+        let document_with_data = Document {
+            data: Some(PrimaryData::Single(resource)),
+            errors: None,
+            meta: None,
+        };
+
+        assert_eq!(document_with_data.is_valid(), true);
+
+        let document_with_errors = Document {
+            data: None,
+            errors: Some(errors),
+            meta: None,
+        };
+
+        assert_eq!(document_with_errors.is_valid(), true);
+
+    }
+
+    #[test]
+    fn errors_from_json() {}
 }

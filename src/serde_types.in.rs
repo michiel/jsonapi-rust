@@ -34,8 +34,8 @@ pub type Included = Vec<Resource>;
 #[derive(Serialize, Deserialize, Debug)]
 pub enum PrimaryData {
     None,
-    Resource,
-    Resources,
+    Single(Resource),
+    Multiple(Resources),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
