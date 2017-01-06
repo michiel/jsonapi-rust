@@ -5,7 +5,8 @@ include!(concat!(env!("OUT_DIR"), "/serde_types.rs"));
 
 #[cfg(test)]
 mod tests {
-    use jsonapi::*;
+    use super::*;
+
     use serde_json;
     #[test]
     fn it_works() {
