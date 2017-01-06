@@ -5,14 +5,15 @@ include!(concat!(env!("OUT_DIR"), "/serde_types.rs"));
 
 #[cfg(test)]
 mod tests {
+    use jsonapi::*;
     #[test]
     fn it_works() {
-        let resource = ::Resource {
+        let resource = Resource {
             _type: format!("test"),
             id: format!("123"),
-            attributes: ::ResourceAttributes::new(),
-            relationships: ::Relationships::new(),
-            links: ::Links::new(),
+            attributes: ResourceAttributes::new(),
+            relationships: Relationships::new(),
+            links: Links::new(),
         };
     }
 }

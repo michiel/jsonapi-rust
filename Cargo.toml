@@ -9,4 +9,4 @@ serde_codegen = "0.8"
 
 [dependencies]
 serde = "0.8"
-serde_json = "0.8"  # just for the example, not required in general
+serde_json = "0.8"
