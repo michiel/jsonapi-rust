@@ -77,5 +77,11 @@ mod tests {
     }
 
     #[test]
-    fn errors_from_json() {}
+    fn error_from_json() {
+
+        let serialized = r#"{"id":"1", "links" : {}, "status" : "unknown", "code" : "code1", "title" : "error-title", "detail": "error-detail"}"#;
+        let error: Result<Error, serde_json::Error> = serde_json::from_str(&serialized);
+        assert_eq!(error.is_ok(), true);
+        assert_eq!(error.unwrap().id, "1");
+    }
 }
