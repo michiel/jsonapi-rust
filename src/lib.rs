@@ -3,6 +3,31 @@ extern crate serde_json;
 
 include!(concat!(env!("OUT_DIR"), "/serde_types.rs"));
 
+use std::error::Error;
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
+
+pub fn read_json_file(filename: &str) -> String {
+    // Create a path to the desired file
+    let path = Path::new(filename);
+    let display = path.display();
+
+    let mut file = match File::open(&path) {
+        Err(why) => panic!("couldn't open {}: {}", display, Error::description(&why)),
+        Ok(file) => file,
+    };
+
+    // Read the file contents into a string, returns `io::Result<usize>`
+    let mut s = String::new();
+    match file.read_to_string(&mut s) {
+        Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
+        Ok(_) => {} // print!("{} contains:\n{}", display, s),
+    };
+
+    s
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -48,7 +73,7 @@ mod tests {
             links: Links::new(),
         };
 
-        let errors = Errors::new();
+        let errors = JsonApiErrors::new();
 
         let invalid_document = Document {
             data: None,
@@ -77,11 +102,19 @@ mod tests {
     }
 
     #[test]
-    fn error_from_json() {
+    fn error_from_json_string() {
 
         let serialized = r#"{"id":"1", "links" : {}, "status" : "unknown", "code" : "code1", "title" : "error-title", "detail": "error-detail"}"#;
-        let error: Result<Error, serde_json::Error> = serde_json::from_str(&serialized);
+        let error: Result<JsonApiError, serde_json::Error> = serde_json::from_str(&serialized);
         assert_eq!(error.is_ok(), true);
         assert_eq!(error.unwrap().id, "1");
+    }
+
+    #[test]
+    fn api_response_from_json_file() {
+
+        let s = ::read_json_file("data/results.json");
+        let data: Result<JsonApiResponse, serde_json::Error> = serde_json::from_str(&s);
+        println!("api_response_from_json_file : Data: {:?}", data);
     }
 }

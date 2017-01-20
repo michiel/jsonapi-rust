@@ -39,13 +39,18 @@ pub enum PrimaryData {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct JsonApiResponse {
+    pub data: PrimaryData,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ErrorSource {
     pub pointer: Option<String>,
     pub parameter: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Error {
+pub struct JsonApiError {
     pub id: String,
     pub links: Links,
     pub status: String,
@@ -56,7 +61,7 @@ pub struct Error {
     pub meta: Option<Meta>,
 }
 
-pub type Errors = Vec<Error>;
+pub type JsonApiErrors = Vec<JsonApiError>;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Pagination {
@@ -86,7 +91,7 @@ impl Pagination {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Document {
     pub data: Option<PrimaryData>,
-    pub errors: Option<Errors>,
+    pub errors: Option<JsonApiErrors>,
     pub meta: Option<Meta>,
 }
 
