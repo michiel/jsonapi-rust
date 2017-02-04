@@ -1,7 +1,10 @@
 extern crate serde;
+#[macro_use]
+extern crate serde_derive;
+
 extern crate serde_json;
 
-include!(concat!(env!("OUT_DIR"), "/serde_types.rs"));
+pub mod api;
 
 use std::error::Error;
 use std::fs::File;
@@ -30,7 +33,7 @@ pub fn read_json_file(filename: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::api::*;
 
     use serde_json;
 

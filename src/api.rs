@@ -1,4 +1,6 @@
 
+extern crate serde_json;
+
 use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Debug)]
