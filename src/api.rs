@@ -4,6 +4,14 @@ extern crate serde_json;
 use std::collections::HashMap;
 
 pub type JsonApiValue = serde_json::Value;
+pub type Resources = Vec<Resource>;
+pub type ResourceIdentifiers = Vec<ResourceIdentifier>;
+pub type Links = HashMap<String, String>;
+pub type Meta = HashMap<String, String>;
+pub type ResourceAttributes = HashMap<String, JsonApiValue>;
+pub type Relationships = HashMap<String, Relationship>;
+pub type Included = Vec<Resource>;
+pub type JsonApiErrors = Vec<JsonApiError>;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct ResourceIdentifier {
@@ -22,18 +30,11 @@ pub struct Resource {
     pub links: Option<Links>,
 }
 
-pub type Resources = Vec<Resource>;
-pub type Links = HashMap<String, String>;
-pub type Meta = HashMap<String, String>;
-pub type ResourceAttributes = HashMap<String, JsonApiValue>;
-
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Relationship {
-    pub data: ResourceIdentifier,
+    pub data: IdentifierData,
+    pub links: Option<Links>,
 }
-pub type Relationships = HashMap<String, Relationship>;
-
-pub type Included = Vec<Resource>;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(untagged)]
@@ -41,6 +42,14 @@ pub enum PrimaryData {
     None,
     Single(Resource),
     Multiple(Resources),
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[serde(untagged)]
+pub enum IdentifierData {
+    None,
+    Single(ResourceIdentifier),
+    Multiple(ResourceIdentifiers),
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -66,8 +75,6 @@ pub struct JsonApiError {
     pub source: Option<ErrorSource>,
     pub meta: Option<Meta>,
 }
-
-pub type JsonApiErrors = Vec<JsonApiError>;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Pagination {
