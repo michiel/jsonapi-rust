@@ -47,10 +47,12 @@ mod tests {
             links: Links::new(),
         };
 
+        assert_eq!(resource.id, format!("123"));
+
         let serialized = serde_json::to_string(&resource).unwrap();
-        println!("serialized = {}", serialized);
         let deserialized: Resource = serde_json::from_str(&serialized).unwrap();
-        println!("deserialized = {:?}", deserialized);
+
+        assert_eq!(deserialized.id, resource.id);
 
         let document = Document {
             data: None,
@@ -107,17 +109,64 @@ mod tests {
     #[test]
     fn error_from_json_string() {
 
-        let serialized = r#"{"id":"1", "links" : {}, "status" : "unknown", "code" : "code1", "title" : "error-title", "detail": "error-detail"}"#;
+        let serialized = r#"
+        {"id":"1", "links" : {}, "status" : "unknown", "code" : "code1", "title" : "error-title", "detail": "error-detail"}
+        "#;
         let error: Result<JsonApiError, serde_json::Error> = serde_json::from_str(&serialized);
         assert_eq!(error.is_ok(), true);
         assert_eq!(error.unwrap().id, "1");
     }
 
     #[test]
-    fn api_response_from_json_file() {
-
-        let s = ::read_json_file("data/results.json");
-        let data: Result<JsonApiResponse, serde_json::Error> = serde_json::from_str(&s);
-        println!("api_response_from_json_file : Data: {:?}", data);
+    fn single_resource_from_json_string() {
+        let serialized =
+            r#"{ "id" :"1", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} }"#;
+        let data: Result<Resource, serde_json::Error> = serde_json::from_str(&serialized);
+        assert_eq!(data.is_ok(), true);
     }
+
+    #[test]
+    fn multiple_resource_from_json_string() {
+        let serialized = r#"[
+            { "id" :"1", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} },
+            { "id" :"2", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} },
+            { "id" :"3", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} }
+        ]"#;
+        let data: Result<Resources, serde_json::Error> = serde_json::from_str(&serialized);
+        assert_eq!(data.is_ok(), true);
+    }
+
+    #[test]
+    fn no_data_response_from_json_string() {
+        let serialized = r#"{
+            "data" : null
+        }"#;
+        let data: Result<JsonApiResponse, serde_json::Error> = serde_json::from_str(&serialized);
+        assert_eq!(data.is_ok(), true);
+    }
+
+    #[test]
+    fn single_data_response_from_json_string() {
+        let serialized = r#"{
+            "data" : {
+                "id" :"1", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {}
+            }
+        }"#;
+        let data: Result<JsonApiResponse, serde_json::Error> = serde_json::from_str(&serialized);
+        assert_eq!(data.is_ok(), true);
+    }
+
+    #[test]
+    fn multiple_data_response_from_json_string() {
+        let serialized = r#"{
+            "data" : [
+                { "id" :"1", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} },
+                { "id" :"2", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} },
+                { "id" :"3", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} }
+            ]
+        }"#;
+        let data: Result<JsonApiResponse, serde_json::Error> = serde_json::from_str(&serialized);
+        assert_eq!(data.is_ok(), true);
+    }
+
 }

@@ -10,7 +10,7 @@ pub struct ResourceIdentifier {
     pub id: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Resource {
     #[serde(rename = "type")]
     pub _type: String,
@@ -25,7 +25,7 @@ pub type Links = HashMap<String, String>;
 pub type Meta = HashMap<String, String>;
 pub type ResourceAttributes = HashMap<String, String>;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Relationship {
     }
 
@@ -33,7 +33,8 @@ pub type Relationships = Vec<Relationship>;
 
 pub type Included = Vec<Resource>;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[serde(untagged)]
 pub enum PrimaryData {
     None,
     Single(Resource),
