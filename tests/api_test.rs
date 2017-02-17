@@ -9,7 +9,6 @@ use std::io::prelude::*;
 use std::path::Path;
 
 pub fn read_json_file(filename: &str) -> String {
-    // Create a path to the desired file
     let path = Path::new(filename);
     let display = path.display();
 
@@ -18,11 +17,10 @@ pub fn read_json_file(filename: &str) -> String {
         Ok(file) => file,
     };
 
-    // Read the file contents into a string, returns `io::Result<usize>`
     let mut s = String::new();
     match file.read_to_string(&mut s) {
         Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
-        Ok(_) => {} // print!("{} contains:\n{}", display, s),
+        Ok(_) => {}
     };
 
     s
@@ -198,6 +196,7 @@ fn api_response_collection_from_json_file() {
 
     match data {
         Ok(res) => {
+
             match res.data {
                 PrimaryData::Multiple(arr) => {
                     assert_eq!(arr.len(), 1);
@@ -213,6 +212,31 @@ fn api_response_collection_from_json_file() {
                     assert!(false);
                 }
             }
+
+            match res.included {
+                Some(arr) => {
+                    assert_eq!(arr.len(), 3);
+                    assert_eq!(arr[0].id, "9");
+                    assert_eq!(arr[1].id, "5");
+                    assert_eq!(arr[2].id, "12");
+                }
+                None => {
+                    println!("api_response_collection_from_json_file : Expected three Resources \
+                              in 'included' in a vector");
+                    assert!(false);
+                }
+            }
+
+            match res.links {
+                Some(links) => {
+                    assert_eq!(links.len(), 3);
+                }
+                None => {
+                    println!("api_response_collection_from_json_file : expected links");
+                    assert!(false);
+                }
+            }
+
         }
         Err(err) => {
             println!("api_response_collection_from_json_file : Error: {:?}", err);

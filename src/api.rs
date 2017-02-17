@@ -1,4 +1,3 @@
-
 extern crate serde_json;
 
 use std::collections::HashMap;
@@ -56,6 +55,7 @@ pub enum IdentifierData {
 pub struct JsonApiResponse {
     pub data: PrimaryData,
     pub included: Option<Resources>,
+    pub links: Option<Links>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
