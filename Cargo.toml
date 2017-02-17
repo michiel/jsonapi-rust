@@ -7,3 +7,16 @@ authors = ["Michiel Kalkman <michiel@nosuchtype.com>"]
 serde = "0.9"
 serde_json = "0.9"
 serde_derive = "0.9"
+
+[package]
+description = "JSONAPI implementation"
+
+documentation = "https://michiel.github.io/jsonapi-rust/jsonapi/index.html"
+homepage = "https://github.com/michiel/jsonapi-rust"
+repository = "https://github.com/michiel/jsonapi-rust.git"
+readme = "https://github.com/michiel/jsonapi-rust/README.md"
+keywords = ["jsonapi"]
+categories = []
+license = "MIT"
+[badges]
+travis-ci = { repository = "https://travis-ci.org/michiel/jsonapi-rust/", branch = "master" }
