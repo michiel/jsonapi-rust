@@ -43,8 +43,8 @@ mod tests {
             _type: format!("test"),
             id: format!("123"),
             attributes: ResourceAttributes::new(),
-            relationships: Relationships::new(),
-            links: Links::new(),
+            relationships: Some(Relationships::new()),
+            links: None,
         };
 
         assert_eq!(resource.id, format!("123"));
@@ -74,8 +74,8 @@ mod tests {
             _type: format!("test"),
             id: format!("123"),
             attributes: ResourceAttributes::new(),
-            relationships: Relationships::new(),
-            links: Links::new(),
+            relationships: Some(Relationships::new()),
+            links: None,
         };
 
         let errors = JsonApiErrors::new();
@@ -120,7 +120,7 @@ mod tests {
     #[test]
     fn single_resource_from_json_string() {
         let serialized =
-            r#"{ "id" :"1", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} }"#;
+            r#"{ "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} }"#;
         let data: Result<Resource, serde_json::Error> = serde_json::from_str(&serialized);
         assert_eq!(data.is_ok(), true);
     }
@@ -128,9 +128,9 @@ mod tests {
     #[test]
     fn multiple_resource_from_json_string() {
         let serialized = r#"[
-            { "id" :"1", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} },
-            { "id" :"2", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} },
-            { "id" :"3", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} }
+            { "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} },
+            { "id" :"2", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} },
+            { "id" :"3", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} }
         ]"#;
         let data: Result<Resources, serde_json::Error> = serde_json::from_str(&serialized);
         assert_eq!(data.is_ok(), true);
@@ -149,7 +149,7 @@ mod tests {
     fn single_data_response_from_json_string() {
         let serialized = r#"{
             "data" : {
-                "id" :"1", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {}
+                "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {}
             }
         }"#;
         let data: Result<JsonApiResponse, serde_json::Error> = serde_json::from_str(&serialized);
@@ -160,13 +160,43 @@ mod tests {
     fn multiple_data_response_from_json_string() {
         let serialized = r#"{
             "data" : [
-                { "id" :"1", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} },
-                { "id" :"2", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} },
-                { "id" :"3", "type" : "post", "attributes" : {}, "relationships" : [], "links" : {} }
+                { "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} },
+                { "id" :"2", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} },
+                { "id" :"3", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} }
             ]
         }"#;
         let data: Result<JsonApiResponse, serde_json::Error> = serde_json::from_str(&serialized);
         assert_eq!(data.is_ok(), true);
+    }
+
+    #[test]
+    fn api_response_from_json_file() {
+
+        let s = ::read_json_file("data/results.json");
+        let data: Result<JsonApiResponse, serde_json::Error> = serde_json::from_str(&s);
+
+        match data {
+            Ok(res) => {
+                match res.data {
+                    PrimaryData::Multiple(arr) => {
+                        assert_eq!(arr.len(), 1);
+                    }
+                    PrimaryData::Single(_) => {
+                        println!("api_response_from_json_file : Expected one Resource in a \
+                                  vector, not a direct Resource");
+                        assert!(false);
+                    }
+                    PrimaryData::None => {
+                        println!("api_response_from_json_file : Expected one Resource in a vector");
+                        assert!(false);
+                    }
+                }
+            }
+            Err(err) => {
+                println!("api_response_from_json_file : Error: {:?}", err);
+                assert!(false);
+            }
+        }
     }
 
 }

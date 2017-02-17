@@ -3,7 +3,9 @@ extern crate serde_json;
 
 use std::collections::HashMap;
 
-#[derive(Serialize, Deserialize, Debug)]
+pub type JsonApiValue = serde_json::Value;
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct ResourceIdentifier {
     #[serde(rename = "type")]
     pub _type: String,
@@ -16,20 +18,20 @@ pub struct Resource {
     pub _type: String,
     pub id: String,
     pub attributes: ResourceAttributes,
-    pub relationships: Relationships,
-    pub links: Links,
+    pub relationships: Option<Relationships>,
+    pub links: Option<Links>,
 }
 
 pub type Resources = Vec<Resource>;
 pub type Links = HashMap<String, String>;
 pub type Meta = HashMap<String, String>;
-pub type ResourceAttributes = HashMap<String, String>;
+pub type ResourceAttributes = HashMap<String, JsonApiValue>;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Relationship {
-    }
-
-pub type Relationships = Vec<Relationship>;
+    pub data: ResourceIdentifier,
+}
+pub type Relationships = HashMap<String, Relationship>;
 
 pub type Included = Vec<Resource>;
 
@@ -41,9 +43,10 @@ pub enum PrimaryData {
     Multiple(Resources),
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiResponse {
     pub data: PrimaryData,
+    pub included: Option<Resources>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
