@@ -1,6 +1,5 @@
 use queryst::parse;
 use std::collections::HashMap;
-use serde_json; //::value::Value;
 
 #[derive(Debug, PartialEq)]
 pub struct PageQuery {
@@ -16,10 +15,11 @@ pub struct Query {
     pub page: Option<PageQuery>,
 }
 
+/*
 fn extract_array(obj: serde_json::value::Value, key: &str) -> Option<Vec<String>> {
-    if let Some(thingo) = obj.get(key) {
-        if let Some(thingo_str) = thingo.as_str() {
-            let arr: Vec<String> = thingo_str.split(",").map(|s| s.to_string()).collect();
+    if let Some(thing) = obj.get(key) {
+        if let Some(thing_str) = thing.as_str() {
+            let arr: Vec<String> = thing_str.split(",").map(|s| s.to_string()).collect();
             println!("Including : {:?}", arr);
             Some(arr)
         } else {
@@ -29,6 +29,7 @@ fn extract_array(obj: serde_json::value::Value, key: &str) -> Option<Vec<String>
         None
     }
 }
+*/
 
 impl Query {
     pub fn from_params(params: &str) -> Self {
@@ -36,20 +37,21 @@ impl Query {
         match parse(params) {
             Ok(o) => {
                 println!("PARAMS : {:?}", o);
-                /*
-                if let Some(include) = o.find("include") {
-                    if let Some(include_str) = include.as_str() {
-                        let arr: Vec<String> =
-                            include_str.split(",").map(|s| s.to_string()).collect();
-                        println!("Including : {:?}", arr);
-                    } else {
+                // let include = extract_array(&o, &"include");
+
+                let include = match o.find("include") {
+                    None => None,
+                    Some(inc) => {
+                        match inc.as_str() {
+                            None => None,
+                            Some(include_str) => {
+                                let arr: Vec<String> =
+                                    include_str.split(",").map(|s| s.to_string()).collect();
+                                Some(arr)
+                            }
+                        }
                     }
-
-                } else {
-                }
-                */
-
-                let include = extract_array(o, "include");
+                };
 
                 let fields = o.find("fields");
                 println!("Fields : {:?}", fields);
@@ -59,7 +61,7 @@ impl Query {
 
                 Query {
                     _type: format!("none"),
-                    include: None,
+                    include: include,
                     fields: None,
                     page: None,
                 }
