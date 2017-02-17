@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/michiel/jsonapi-rust.svg?branch=master)](https://travis-ci.org/michiel/jsonapi-rust)
 
+[Documentation](https://michiel.github.io/jsonapi-rust/)
 
 ## Test
 
