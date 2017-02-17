@@ -15,6 +15,7 @@ license = "MIT"
 serde = "0.9"
 serde_json = "0.9"
 serde_derive = "0.9"
+queryst = "1"
 
 [badges]
 travis-ci = { repository = "https://travis-ci.org/michiel/jsonapi-rust/", branch = "master" }
