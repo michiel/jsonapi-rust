@@ -3,8 +3,8 @@ use std::collections::HashMap;
 
 #[derive(Debug, PartialEq)]
 pub struct PageQuery {
-    pub page: i32,
-    pub size: i32,
+    pub size: i64,
+    pub number: i64,
 }
 
 #[derive(Debug, PartialEq)]
@@ -15,30 +15,11 @@ pub struct Query {
     pub page: Option<PageQuery>,
 }
 
-/*
-fn extract_array(obj: serde_json::value::Value, key: &str) -> Option<Vec<String>> {
-    if let Some(thing) = obj.get(key) {
-        if let Some(thing_str) = thing.as_str() {
-            let arr: Vec<String> = thing_str.split(",").map(|s| s.to_string()).collect();
-            println!("Including : {:?}", arr);
-            Some(arr)
-        } else {
-            None
-        }
-    } else {
-        None
-    }
-}
-*/
-
 impl Query {
     pub fn from_params(params: &str) -> Self {
 
         match parse(params) {
             Ok(o) => {
-                println!("PARAMS : {:?}", o);
-                // let include = extract_array(&o, &"include");
-
                 let include = match o.find("include") {
                     None => None,
                     Some(inc) => {
@@ -53,21 +34,46 @@ impl Query {
                     }
                 };
 
-                let fields = o.find("fields");
-                println!("Fields : {:?}", fields);
+                // let fields = o.find("fields");
 
-                let page = o.find("page");
-                println!("Page : {:?}", page);
+                let page = PageQuery {
+                    number: match o.find_path(&["page", "number"]) {
+                        None => 0,
+                        Some(num) => {
+                            if num.is_string() {
+                                match num.as_str().map(str::parse::<i64>) {
+                                    Some(y) => y.unwrap_or(0),
+                                    None => 0,
+                                }
+                            } else {
+                                0
+                            }
+                        }
+                    },
+                    size: match o.find_path(&["page", "size"]) {
+                        None => 0,
+                        Some(num) => {
+                            if num.is_string() {
+                                match num.as_str().map(str::parse::<i64>) {
+                                    Some(y) => y.unwrap_or(0),
+                                    None => 0,
+                                }
+                            } else {
+                                0
+                            }
+                        }
+                    },
+                };
 
                 Query {
                     _type: format!("none"),
                     include: include,
                     fields: None,
-                    page: None,
+                    page: Some(page),
                 }
             }
             Err(err) => {
-                println!("Can't parse : {:?}", err);
+                println!("Query: Can't parse : {:?}", err);
                 Query {
                     _type: format!("none"),
                     include: None,
