@@ -67,16 +67,6 @@ fn jsonapi_response_can_be_valid() {
 
     let errors = JsonApiErrors::new();
 
-    let invalid_document = JsonApiResponse {
-        data: PrimaryData::None,
-        errors: None,
-        meta: None,
-        included: None,
-        links: None,
-    };
-
-    assert_eq!(invalid_document.is_valid(), false);
-
     let jsonapi_response_with_data = JsonApiResponse {
         data: PrimaryData::Single(resource),
         errors: None,
@@ -96,6 +86,75 @@ fn jsonapi_response_can_be_valid() {
     };
 
     assert_eq!(jsonapi_response_with_errors.is_valid(), true);
+
+}
+
+#[test]
+fn jsonapi_response_invalid_errors() {
+
+    let resource = Resource {
+        _type: format!("test"),
+        id: format!("123"),
+        attributes: ResourceAttributes::new(),
+        relationships: Some(Relationships::new()),
+        links: None,
+    };
+
+    let included_resource = Resource {
+        _type: format!("test"),
+        id: format!("123"),
+        attributes: ResourceAttributes::new(),
+        relationships: Some(Relationships::new()),
+        links: None,
+    };
+
+    let errors = JsonApiErrors::new();
+
+    let no_content_document = JsonApiResponse {
+        data: PrimaryData::None,
+        errors: None,
+        meta: None,
+        included: None,
+        links: None,
+    };
+
+    match no_content_document.validate() {
+        None => assert!(false),
+        Some(errors) => {
+            assert!(errors.contains(&DocumentValidationError::MissingContent));
+        }
+    }
+
+    let mixed_errors_and_data_document = JsonApiResponse {
+        data: PrimaryData::Single(resource),
+        errors: Some(errors),
+        meta: None,
+        included: None,
+        links: None,
+    };
+
+    match mixed_errors_and_data_document.validate() {
+        None => assert!(false),
+        Some(errors) => {
+            assert!(errors.contains(&DocumentValidationError::DataWithErrors));
+        }
+    }
+
+    let included_without_data_document = JsonApiResponse {
+        data: PrimaryData::None,
+        errors: None,
+        meta: None,
+        included: Some(vec![included_resource]),
+        links: None,
+    };
+
+    match included_without_data_document.validate() {
+        None => assert!(false),
+        Some(errors) => {
+            assert!(errors.contains(&DocumentValidationError::IncludedWithoutData));
+        }
+    }
+
 
 }
 
