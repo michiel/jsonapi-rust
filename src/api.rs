@@ -55,7 +55,7 @@ pub enum IdentifierData {
 /// Of these, `data` and `errors` must not co-exist.
 /// The optional field `included` may only be present if the `data` field is present too.
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct JsonApiResponse {
+pub struct JsonApiDocument {
     pub data: PrimaryData,
     pub included: Option<Resources>,
     pub links: Option<Links>,
@@ -111,7 +111,7 @@ impl Pagination {
     }
 }
 
-impl JsonApiResponse {
+impl JsonApiDocument {
     fn has_errors(&self) -> bool {
         !self.errors.is_none()
     }
