@@ -61,6 +61,7 @@ pub struct JsonApiResponse {
     pub links: Option<Links>,
     pub meta: Option<Meta>,
     pub errors: Option<JsonApiErrors>,
+    pub jsonapi: Option<JsonApiInfo>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -78,6 +79,12 @@ pub struct JsonApiError {
     pub title: String,
     pub detail: String,
     pub source: Option<ErrorSource>,
+    pub meta: Option<Meta>,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct JsonApiInfo {
+    pub version: Option<String>,
     pub meta: Option<Meta>,
 }
 

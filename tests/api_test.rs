@@ -29,6 +29,7 @@ fn it_works() {
         meta: None,
         included: None,
         links: None,
+        jsonapi: None,
     };
 
     assert_eq!(jsonapiresponse.is_valid(), false);
@@ -53,6 +54,7 @@ fn jsonapi_response_can_be_valid() {
         meta: None,
         included: None,
         links: None,
+        jsonapi: None,
     };
 
     assert_eq!(jsonapi_response_with_data.is_valid(), true);
@@ -63,6 +65,7 @@ fn jsonapi_response_can_be_valid() {
         meta: None,
         included: None,
         links: None,
+        jsonapi: None,
     };
 
     assert_eq!(jsonapi_response_with_errors.is_valid(), true);
@@ -96,6 +99,7 @@ fn jsonapi_response_invalid_errors() {
         meta: None,
         included: None,
         links: None,
+        jsonapi: None,
     };
 
     match no_content_document.validate() {
@@ -111,6 +115,7 @@ fn jsonapi_response_invalid_errors() {
         meta: None,
         included: None,
         links: None,
+        jsonapi: None,
     };
 
     match mixed_errors_and_data_document.validate() {
@@ -126,6 +131,7 @@ fn jsonapi_response_invalid_errors() {
         meta: None,
         included: Some(vec![included_resource]),
         links: None,
+        jsonapi: None,
     };
 
     match included_without_data_document.validate() {
