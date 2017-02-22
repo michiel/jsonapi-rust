@@ -43,22 +43,20 @@ fn it_works() {
 
     assert_eq!(deserialized.id, resource.id);
 
-    let document = Document {
-        data: None,
+    let jsonapiresponse = JsonApiResponse {
+        data: PrimaryData::None,
         errors: None,
         meta: None,
+        included: None,
+        links: None,
     };
 
-    assert_eq!(document.has_data(), false);
-    assert_eq!(document.has_errors(), false);
-    assert_eq!(document.has_meta(), false);
-
-    assert_eq!(document.is_valid(), false);
+    assert_eq!(jsonapiresponse.is_valid(), false);
 
 }
 
 #[test]
-fn document_can_be_valid() {
+fn jsonapi_response_can_be_valid() {
     let resource = Resource {
         _type: format!("test"),
         id: format!("123"),
@@ -69,29 +67,35 @@ fn document_can_be_valid() {
 
     let errors = JsonApiErrors::new();
 
-    let invalid_document = Document {
-        data: None,
+    let invalid_document = JsonApiResponse {
+        data: PrimaryData::None,
         errors: None,
         meta: None,
+        included: None,
+        links: None,
     };
 
     assert_eq!(invalid_document.is_valid(), false);
 
-    let document_with_data = Document {
-        data: Some(PrimaryData::Single(resource)),
+    let jsonapi_response_with_data = JsonApiResponse {
+        data: PrimaryData::Single(resource),
         errors: None,
         meta: None,
+        included: None,
+        links: None,
     };
 
-    assert_eq!(document_with_data.is_valid(), true);
+    assert_eq!(jsonapi_response_with_data.is_valid(), true);
 
-    let document_with_errors = Document {
-        data: None,
+    let jsonapi_response_with_errors = JsonApiResponse {
+        data: PrimaryData::None,
         errors: Some(errors),
         meta: None,
+        included: None,
+        links: None,
     };
 
-    assert_eq!(document_with_errors.is_valid(), true);
+    assert_eq!(jsonapi_response_with_errors.is_valid(), true);
 
 }
 
