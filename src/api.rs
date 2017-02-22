@@ -50,6 +50,10 @@ pub enum IdentifierData {
     Multiple(ResourceIdentifiers),
 }
 
+/// The specification refers to this as a top-level `document`
+/// The spec dictates that the document must have least one of `data`, `errors` or `meta`.
+/// Of these, `data` and `errors` must not co-exist.
+/// The optional field `included` may only be present if the `data` field is present too.
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiResponse {
     pub data: PrimaryData,
@@ -100,11 +104,15 @@ impl Pagination {
     }
 }
 
-// Spec says at least one of data, errors, meta
-// data and errors must not co-exist
 impl JsonApiResponse {
     fn has_errors(&self) -> bool {
         !self.errors.is_none()
+    }
+    fn has_meta(&self) -> bool {
+        !self.errors.is_none()
+    }
+    fn has_included(&self) -> bool {
+        !self.included.is_none()
     }
     fn has_data(&self) -> bool {
         match self.data {
@@ -112,10 +120,40 @@ impl JsonApiResponse {
             _ => true,
         }
     }
-    fn has_meta(&self) -> bool {
-        !self.meta.is_none()
-    }
     pub fn is_valid(&self) -> bool {
-        self.has_data() ^ self.has_errors()
+        match self.validate() {
+            Some(_) => false,
+            None => true,
+        }
     }
+
+    pub fn validate(&self) -> Option<Vec<DocumentValidationError>> {
+
+        let mut errors = Vec::<DocumentValidationError>::new();
+
+        if self.has_data() && self.has_errors() {
+            errors.push(DocumentValidationError::DataWithErrors);
+        }
+
+        if self.has_included() && !self.has_data() {
+            errors.push(DocumentValidationError::IncludedWithoutData);
+        }
+
+        if !(self.has_data() || self.has_meta() || self.has_errors()) {
+            errors.push(DocumentValidationError::MissingContent);
+        }
+
+        match errors.len() {
+            0 => None,
+            _ => Some(errors),
+        }
+
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub enum DocumentValidationError {
+    IncludedWithoutData,
+    DataWithErrors,
+    MissingContent,
 }
