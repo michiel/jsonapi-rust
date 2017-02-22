@@ -55,15 +55,17 @@ pub struct JsonApiResponse {
     pub data: PrimaryData,
     pub included: Option<Resources>,
     pub links: Option<Links>,
+    pub meta: Option<Meta>,
+    pub errors: Option<JsonApiErrors>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct ErrorSource {
     pub pointer: Option<String>,
     pub parameter: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiError {
     pub id: String,
     pub links: Links,
@@ -100,21 +102,17 @@ impl Pagination {
 
 // Spec says at least one of data, errors, meta
 // data and errors must not co-exist
-#[derive(Serialize, Deserialize, Debug)]
-pub struct Document {
-    pub data: Option<PrimaryData>,
-    pub errors: Option<JsonApiErrors>,
-    pub meta: Option<Meta>,
-}
-
-impl Document {
-    pub fn has_errors(&self) -> bool {
+impl JsonApiResponse {
+    fn has_errors(&self) -> bool {
         !self.errors.is_none()
     }
-    pub fn has_data(&self) -> bool {
-        !self.data.is_none()
+    fn has_data(&self) -> bool {
+        match self.data {
+            PrimaryData::None => false,
+            _ => true,
+        }
     }
-    pub fn has_meta(&self) -> bool {
+    fn has_meta(&self) -> bool {
         !self.meta.is_none()
     }
     pub fn is_valid(&self) -> bool {
