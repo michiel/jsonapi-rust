@@ -34,7 +34,24 @@ impl Query {
                     }
                 };
 
-                // let fields = o.find("fields");
+                let mut fields = HashMap::<String, Vec<String>>::new();
+
+                o.find("fields").map(|x| if x.is_object() {
+                    x.as_object().map(|obj| for (key, value) in obj.iter() {
+                        let arr: Vec<String> = match value.as_str() {
+                            Some(string) => {
+                                let arr: Vec<String> =
+                                    string.split(",").map(|s| s.to_string()).collect();
+                                arr
+                            }
+                            None => Vec::<String>::new(),
+                        };
+                        fields.insert(key.to_string(), arr);
+
+                    });
+                } else {
+                    println!("No fields found in {:?}", x);
+                });
 
                 let page = PageQuery {
                     number: match o.find_path(&["page", "number"]) {
@@ -68,7 +85,7 @@ impl Query {
                 Query {
                     _type: format!("none"),
                     include: include,
-                    fields: None,
+                    fields: Some(fields),
                     page: Some(page),
                 }
             }

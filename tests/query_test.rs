@@ -24,4 +24,28 @@ fn can_parse() {
         }
     }
 
+    match query.fields {
+        None => assert!(false),
+        Some(fields) => {
+            assert_eq!(fields.contains_key("people"), true);
+            assert_eq!(fields.contains_key("articles"), true);
+
+            match fields.get("people") {
+                None => assert!(false),
+                Some(arr) => {
+                    assert_eq!(arr.len(), 1);
+                    assert_eq!(arr[0], "name");
+                }
+            }
+            match fields.get("articles") {
+                None => assert!(false),
+                Some(arr) => {
+                    assert_eq!(arr.len(), 2);
+                    assert_eq!(arr[0], "title");
+                    assert_eq!(arr[1], "body");
+                }
+            }
+        }
+    }
+
 }
