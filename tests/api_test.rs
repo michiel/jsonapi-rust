@@ -32,7 +32,7 @@ fn it_works() {
         jsonapi: None,
     };
 
-    assert_eq!(jsonapidocument.is_valid(), false);
+    assert_eq!(jsonapidocument.is_valid(), true);
 
 }
 
@@ -68,8 +68,7 @@ fn jsonapi_document_can_be_valid() {
         jsonapi: None,
     };
 
-    assert_eq!(jsonapi_document_with_errors.is_valid(), true);
-
+    assert_eq!(jsonapi_document_with_errors.is_valid(), false);
 }
 
 #[test]
@@ -94,7 +93,7 @@ fn jsonapi_document_invalid_errors() {
     let errors = JsonApiErrors::new();
 
     let no_content_document = JsonApiDocument {
-        data: Some(PrimaryData::None),
+        data: None,
         errors: None,
         meta: None,
         included: None,
@@ -107,6 +106,20 @@ fn jsonapi_document_invalid_errors() {
         Some(errors) => {
             assert!(errors.contains(&DocumentValidationError::MissingContent));
         }
+    }
+
+    let null_data_content_document = JsonApiDocument {
+        data: Some(PrimaryData::None),
+        errors: None,
+        meta: None,
+        included: None,
+        links: None,
+        jsonapi: None,
+    };
+
+    match null_data_content_document.validate() {
+        None => assert!(true),
+        Some(_) => assert!(false),
     }
 
     let mixed_errors_and_data_document = JsonApiDocument {
@@ -126,7 +139,7 @@ fn jsonapi_document_invalid_errors() {
     }
 
     let included_without_data_document = JsonApiDocument {
-        data: Some(PrimaryData::None),
+        data: None,
         errors: None,
         meta: None,
         included: Some(vec![included_resource]),
@@ -140,8 +153,6 @@ fn jsonapi_document_invalid_errors() {
             assert!(errors.contains(&DocumentValidationError::IncludedWithoutData));
         }
     }
-
-
 }
 
 #[test]
