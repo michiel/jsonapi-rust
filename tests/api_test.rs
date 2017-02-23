@@ -3,28 +3,8 @@ extern crate serde_json;
 
 use jsonapi::api::*;
 
-use std::error::Error;
-use std::fs::File;
-use std::io::prelude::*;
-use std::path::Path;
-
-pub fn read_json_file(filename: &str) -> String {
-    let path = Path::new(filename);
-    let display = path.display();
-
-    let mut file = match File::open(&path) {
-        Err(why) => panic!("couldn't open {}: {}", display, Error::description(&why)),
-        Ok(file) => file,
-    };
-
-    let mut s = String::new();
-    match file.read_to_string(&mut s) {
-        Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
-        Ok(_) => {}
-    };
-
-    s
-}
+mod helper;
+use helper::read_json_file;
 
 #[test]
 fn it_works() {
@@ -43,20 +23,21 @@ fn it_works() {
 
     assert_eq!(deserialized.id, resource.id);
 
-    let jsonapiresponse = JsonApiResponse {
+    let jsonapidocument = JsonApiDocument {
         data: PrimaryData::None,
         errors: None,
         meta: None,
         included: None,
         links: None,
+        jsonapi: None,
     };
 
-    assert_eq!(jsonapiresponse.is_valid(), false);
+    assert_eq!(jsonapidocument.is_valid(), false);
 
 }
 
 #[test]
-fn jsonapi_response_can_be_valid() {
+fn jsonapi_document_can_be_valid() {
     let resource = Resource {
         _type: format!("test"),
         id: format!("123"),
@@ -67,30 +48,32 @@ fn jsonapi_response_can_be_valid() {
 
     let errors = JsonApiErrors::new();
 
-    let jsonapi_response_with_data = JsonApiResponse {
+    let jsonapi_document_with_data = JsonApiDocument {
         data: PrimaryData::Single(resource),
         errors: None,
         meta: None,
         included: None,
         links: None,
+        jsonapi: None,
     };
 
-    assert_eq!(jsonapi_response_with_data.is_valid(), true);
+    assert_eq!(jsonapi_document_with_data.is_valid(), true);
 
-    let jsonapi_response_with_errors = JsonApiResponse {
+    let jsonapi_document_with_errors = JsonApiDocument {
         data: PrimaryData::None,
         errors: Some(errors),
         meta: None,
         included: None,
         links: None,
+        jsonapi: None,
     };
 
-    assert_eq!(jsonapi_response_with_errors.is_valid(), true);
+    assert_eq!(jsonapi_document_with_errors.is_valid(), true);
 
 }
 
 #[test]
-fn jsonapi_response_invalid_errors() {
+fn jsonapi_document_invalid_errors() {
 
     let resource = Resource {
         _type: format!("test"),
@@ -110,12 +93,13 @@ fn jsonapi_response_invalid_errors() {
 
     let errors = JsonApiErrors::new();
 
-    let no_content_document = JsonApiResponse {
+    let no_content_document = JsonApiDocument {
         data: PrimaryData::None,
         errors: None,
         meta: None,
         included: None,
         links: None,
+        jsonapi: None,
     };
 
     match no_content_document.validate() {
@@ -125,12 +109,13 @@ fn jsonapi_response_invalid_errors() {
         }
     }
 
-    let mixed_errors_and_data_document = JsonApiResponse {
+    let mixed_errors_and_data_document = JsonApiDocument {
         data: PrimaryData::Single(resource),
         errors: Some(errors),
         meta: None,
         included: None,
         links: None,
+        jsonapi: None,
     };
 
     match mixed_errors_and_data_document.validate() {
@@ -140,12 +125,13 @@ fn jsonapi_response_invalid_errors() {
         }
     }
 
-    let included_without_data_document = JsonApiResponse {
+    let included_without_data_document = JsonApiDocument {
         data: PrimaryData::None,
         errors: None,
         meta: None,
         included: Some(vec![included_resource]),
         links: None,
+        jsonapi: None,
     };
 
     match included_without_data_document.validate() {
@@ -189,27 +175,27 @@ fn multiple_resource_from_json_string() {
 }
 
 #[test]
-fn no_data_response_from_json_string() {
+fn no_data_document_from_json_string() {
     let serialized = r#"{
             "data" : null
         }"#;
-    let data: Result<JsonApiResponse, serde_json::Error> = serde_json::from_str(&serialized);
+    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&serialized);
     assert_eq!(data.is_ok(), true);
 }
 
 #[test]
-fn single_data_response_from_json_string() {
+fn single_data_document_from_json_string() {
     let serialized = r#"{
             "data" : {
                 "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {}
             }
         }"#;
-    let data: Result<JsonApiResponse, serde_json::Error> = serde_json::from_str(&serialized);
+    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&serialized);
     assert_eq!(data.is_ok(), true);
 }
 
 #[test]
-fn multiple_data_response_from_json_string() {
+fn multiple_data_document_from_json_string() {
     let serialized = r#"{
             "data" : [
                 { "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} },
@@ -217,15 +203,15 @@ fn multiple_data_response_from_json_string() {
                 { "id" :"3", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} }
             ]
         }"#;
-    let data: Result<JsonApiResponse, serde_json::Error> = serde_json::from_str(&serialized);
+    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&serialized);
     assert_eq!(data.is_ok(), true);
 }
 
 #[test]
-fn api_response_from_json_file() {
+fn api_document_from_json_file() {
 
     let s = ::read_json_file("data/results.json");
-    let data: Result<JsonApiResponse, serde_json::Error> = serde_json::from_str(&s);
+    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&s);
 
     match data {
         Ok(res) => {
@@ -234,28 +220,28 @@ fn api_response_from_json_file() {
                     assert_eq!(arr.len(), 1);
                 }
                 PrimaryData::Single(_) => {
-                    println!("api_response_from_json_file : Expected one Resource in a vector, \
+                    println!("api_document_from_json_file : Expected one Resource in a vector, \
                               not a direct Resource");
                     assert!(false);
                 }
                 PrimaryData::None => {
-                    println!("api_response_from_json_file : Expected one Resource in a vector");
+                    println!("api_document_from_json_file : Expected one Resource in a vector");
                     assert!(false);
                 }
             }
         }
         Err(err) => {
-            println!("api_response_from_json_file : Error: {:?}", err);
+            println!("api_document_from_json_file : Error: {:?}", err);
             assert!(false);
         }
     }
 }
 
 #[test]
-fn api_response_collection_from_json_file() {
+fn api_document_collection_from_json_file() {
 
     let s = ::read_json_file("data/collection.json");
-    let data: Result<JsonApiResponse, serde_json::Error> = serde_json::from_str(&s);
+    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&s);
 
     match data {
         Ok(res) => {
@@ -265,12 +251,12 @@ fn api_response_collection_from_json_file() {
                     assert_eq!(arr.len(), 1);
                 }
                 PrimaryData::Single(_) => {
-                    println!("api_response_collection_from_json_file : Expected one Resource in \
+                    println!("api_document_collection_from_json_file : Expected one Resource in \
                               a vector, not a direct Resource");
                     assert!(false);
                 }
                 PrimaryData::None => {
-                    println!("api_response_collection_from_json_file : Expected one Resource in \
+                    println!("api_document_collection_from_json_file : Expected one Resource in \
                               a vector");
                     assert!(false);
                 }
@@ -284,7 +270,7 @@ fn api_response_collection_from_json_file() {
                     assert_eq!(arr[2].id, "12");
                 }
                 None => {
-                    println!("api_response_collection_from_json_file : Expected three Resources \
+                    println!("api_document_collection_from_json_file : Expected three Resources \
                               in 'included' in a vector");
                     assert!(false);
                 }
@@ -295,15 +281,64 @@ fn api_response_collection_from_json_file() {
                     assert_eq!(links.len(), 3);
                 }
                 None => {
-                    println!("api_response_collection_from_json_file : expected links");
+                    println!("api_document_collection_from_json_file : expected links");
                     assert!(false);
                 }
             }
 
         }
         Err(err) => {
-            println!("api_response_collection_from_json_file : Error: {:?}", err);
+            println!("api_document_collection_from_json_file : Error: {:?}", err);
             assert!(false);
         }
     }
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_resource_001() {
+    let s = ::read_json_file("data/resource_001.json");
+    let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_resource_002() {
+    let s = ::read_json_file("data/resource_002.json");
+    let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_resource_003() {
+    let s = ::read_json_file("data/resource_003.json");
+    let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_compound_document() {
+    let s = ::read_json_file("data/compound_document.json");
+    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_links_001() {
+    let s = ::read_json_file("data/links_001.json");
+    let data: Result<Links, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_links_002() {
+    let s = ::read_json_file("data/links_002.json");
+    let data: Result<Links, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_jsonapi_info() {
+    let s = ::read_json_file("data/jsonapi_info_001.json");
+    let data: Result<JsonApiInfo, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
 }

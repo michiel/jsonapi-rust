@@ -4,8 +4,8 @@ use std::collections::HashMap;
 pub type JsonApiValue = serde_json::Value;
 pub type Resources = Vec<Resource>;
 pub type ResourceIdentifiers = Vec<ResourceIdentifier>;
-pub type Links = HashMap<String, String>;
-pub type Meta = HashMap<String, String>;
+pub type Links = HashMap<String, JsonApiValue>;
+pub type Meta = HashMap<String, JsonApiValue>;
 pub type ResourceAttributes = HashMap<String, JsonApiValue>;
 pub type Relationships = HashMap<String, Relationship>;
 pub type Included = Vec<Resource>;
@@ -55,12 +55,13 @@ pub enum IdentifierData {
 /// Of these, `data` and `errors` must not co-exist.
 /// The optional field `included` may only be present if the `data` field is present too.
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
-pub struct JsonApiResponse {
+pub struct JsonApiDocument {
     pub data: PrimaryData,
     pub included: Option<Resources>,
     pub links: Option<Links>,
     pub meta: Option<Meta>,
     pub errors: Option<JsonApiErrors>,
+    pub jsonapi: Option<JsonApiInfo>,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -78,6 +79,12 @@ pub struct JsonApiError {
     pub title: String,
     pub detail: String,
     pub source: Option<ErrorSource>,
+    pub meta: Option<Meta>,
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq)]
+pub struct JsonApiInfo {
+    pub version: Option<String>,
     pub meta: Option<Meta>,
 }
 
@@ -104,7 +111,7 @@ impl Pagination {
     }
 }
 
-impl JsonApiResponse {
+impl JsonApiDocument {
     fn has_errors(&self) -> bool {
         !self.errors.is_none()
     }
