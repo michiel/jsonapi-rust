@@ -116,20 +116,6 @@ impl Pagination {
 }
 
 /// Top-level JSON-API Document
-///
-/// ```
-/// use jsonapi::api::JsonApiDocument;
-///
-/// let serialized = r#"{
-///   "data" : [
-///     { "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} },
-///     { "id" :"2", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} },
-///     { "id" :"3", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} }
-///   ]
-/// }"#;
-/// let doc = JsonApiDocument::from_str(&serialized);
-/// assert_eq!(doc.is_ok(), true);
-/// ```
 impl JsonApiDocument {
     fn has_errors(&self) -> bool {
         !self.errors.is_none()
@@ -168,6 +154,30 @@ impl JsonApiDocument {
 
     /// This function returns a `Vec` with identified specification violations enumerated in
     /// `DocumentValidationError`
+    ///
+    /// ```
+    /// use jsonapi::api::{JsonApiDocument, PrimaryData, JsonApiErrors, DocumentValidationError};
+    ///
+    /// let doc = JsonApiDocument {
+    ///     data: Some(PrimaryData::None),
+    ///     errors: Some(JsonApiErrors::new()),
+    ///     meta: None,
+    ///     included: None,
+    ///     links: None,
+    ///     jsonapi: None,
+    /// };
+    ///
+    /// match doc.validate() {
+    ///   Some(errors) => {
+    ///     assert!(
+    ///       errors.contains(
+    ///         &DocumentValidationError::DataWithErrors
+    ///       )
+    ///     )
+    ///   }
+    ///   None => assert!(false)
+    /// }
+    /// ```
     pub fn validate(&self) -> Option<Vec<DocumentValidationError>> {
 
         let mut errors = Vec::<DocumentValidationError>::new();
@@ -192,6 +202,20 @@ impl JsonApiDocument {
     }
 
     /// Instantiate from string
+    ///
+    /// ```
+    /// use jsonapi::api::JsonApiDocument;
+    ///
+    /// let serialized = r#"{
+    ///   "data" : [
+    ///     { "id":"1", "type":"post", "attributes":{}, "relationships":{}, "links" :{} },
+    ///     { "id":"2", "type":"post", "attributes":{}, "relationships":{}, "links" :{} },
+    ///     { "id":"3", "type":"post", "attributes":{}, "relationships":{}, "links" :{} }
+    ///   ]
+    /// }"#;
+    /// let doc = JsonApiDocument::from_str(&serialized);
+    /// assert_eq!(doc.is_ok(), true);
+    /// ```
     pub fn from_str(s: &str) -> Result<Self, serde_json::Error> {
         let data: Result<Self, serde_json::Error> = serde_json::from_str(&s);
         data
