@@ -122,7 +122,7 @@ impl JsonApiDocument {
         !self.included.is_none()
     }
     fn has_data(&self) -> bool {
-        !self.data.is_none()
+        if self.data.is_none() {
             false
         } else {
             match self.data {
