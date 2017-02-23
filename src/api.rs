@@ -18,6 +18,8 @@ pub struct ResourceIdentifier {
     pub id: String,
 }
 
+///
+/// JSON-API Resource
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Resource {
     #[serde(rename = "type")]
@@ -113,6 +115,21 @@ impl Pagination {
     }
 }
 
+/// Top-level JSON-API Document
+///
+/// ```
+/// use jsonapi::api::JsonApiDocument;
+///
+/// let serialized = r#"{
+///   "data" : [
+///     { "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} },
+///     { "id" :"2", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} },
+///     { "id" :"3", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} }
+///   ]
+/// }"#;
+/// let doc = JsonApiDocument::from_str(&serialized);
+/// assert_eq!(doc.is_ok(), true);
+/// ```
 impl JsonApiDocument {
     fn has_errors(&self) -> bool {
         !self.errors.is_none()
@@ -124,22 +141,24 @@ impl JsonApiDocument {
         !self.included.is_none()
     }
     fn has_data(&self) -> bool {
-        if self.data.is_none() {
-            false
-        } else {
-            match self.data {
-                Some(ref d) => {
-                    match d {
-                        &PrimaryData::None => false,
-                        _ => true,
-                    }
-                }
-                None => false,
-            }
-        }
+        !self.data.is_none()
     }
     /// This function returns `false` if the `JsonApiDocument` contains any violations of the
     /// specification. See `DocumentValidationError`
+    ///
+    /// ```
+    /// use jsonapi::api::{JsonApiDocument, PrimaryData, JsonApiErrors};
+    /// let doc = JsonApiDocument {
+    ///     data: Some(PrimaryData::None),
+    ///     errors: Some(JsonApiErrors::new()),
+    ///     meta: None,
+    ///     included: None,
+    ///     links: None,
+    ///     jsonapi: None,
+    /// };
+    ///
+    /// assert_eq!(doc.is_valid(), false);
+    /// ```
     pub fn is_valid(&self) -> bool {
         match self.validate() {
             Some(_) => false,
@@ -170,6 +189,12 @@ impl JsonApiDocument {
             _ => Some(errors),
         }
 
+    }
+
+    /// Instantiate from string
+    pub fn from_str(s: &str) -> Result<Self, serde_json::Error> {
+        let data: Result<Self, serde_json::Error> = serde_json::from_str(&s);
+        data
     }
 }
 

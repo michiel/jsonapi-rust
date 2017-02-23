@@ -7,6 +7,21 @@ pub struct PageQuery {
     pub number: i64,
 }
 
+/// JSON-API Query parameters
+///
+/// ```
+/// use jsonapi::query::Query;
+/// let query = Query::from_params("include=author&fields[articles]=title,\
+///                                 body&fields[people]=name&page[number]=3&page[size]=1");
+/// match query.include {
+///     None => assert!(false),
+///     Some(include) => {
+///         assert_eq!(include.len(), 1);
+///         assert_eq!(include[0], "author");
+///     }
+/// }
+///
+/// ```
 #[derive(Debug, PartialEq)]
 pub struct Query {
     pub _type: String,
