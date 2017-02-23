@@ -293,3 +293,52 @@ fn api_document_collection_from_json_file() {
         }
     }
 }
+
+#[test]
+fn can_deserialize_jsonapi_example_resource_001() {
+    let s = ::read_json_file("data/resource_001.json");
+    let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_resource_002() {
+    let s = ::read_json_file("data/resource_002.json");
+    let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_resource_003() {
+    let s = ::read_json_file("data/resource_003.json");
+    let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_compound_document() {
+    let s = ::read_json_file("data/compound_document.json");
+    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_links_001() {
+    let s = ::read_json_file("data/links_001.json");
+    let data: Result<Links, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_links_002() {
+    let s = ::read_json_file("data/links_002.json");
+    let data: Result<Links, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_jsonapi_info() {
+    let s = ::read_json_file("data/jsonapi_info_001.json");
+    let data: Result<JsonApiInfo, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}

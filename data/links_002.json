@@ -1,0 +1,8 @@
+{
+  "related": {
+    "href": "http://example.com/articles/1/comments",
+    "meta": {
+      "count": 10
+    }
+  }
+}
