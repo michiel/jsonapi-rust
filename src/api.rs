@@ -70,6 +70,7 @@ pub struct ErrorSource {
     pub parameter: Option<String>,
 }
 
+/// JSON-API Error
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiError {
     pub id: String,
@@ -82,6 +83,7 @@ pub struct JsonApiError {
     pub meta: Option<Meta>,
 }
 
+/// Optional JsonApiDocument payload identifying the JSON-API version the server implements
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiInfo {
     pub version: Option<String>,
@@ -136,6 +138,8 @@ impl JsonApiDocument {
             }
         }
     }
+    /// This function returns `false` if the `JsonApiDocument` contains any violations of the
+    /// specification. See `DocumentValidationError`
     pub fn is_valid(&self) -> bool {
         match self.validate() {
             Some(_) => false,
@@ -143,6 +147,8 @@ impl JsonApiDocument {
         }
     }
 
+    /// This function returns a `Vec` with identified specification violations enumerated in
+    /// `DocumentValidationError`
     pub fn validate(&self) -> Option<Vec<DocumentValidationError>> {
 
         let mut errors = Vec::<DocumentValidationError>::new();
@@ -167,6 +173,7 @@ impl JsonApiDocument {
     }
 }
 
+/// Top-level (Document) JSON-API specification violations
 #[derive(Debug, PartialEq)]
 pub enum DocumentValidationError {
     IncludedWithoutData,
