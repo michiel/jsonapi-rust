@@ -56,7 +56,7 @@ pub enum IdentifierData {
 /// The optional field `included` may only be present if the `data` field is present too.
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiDocument {
-    pub data: PrimaryData,
+    pub data: Option<PrimaryData>,
     pub included: Option<Resources>,
     pub links: Option<Links>,
     pub meta: Option<Meta>,
@@ -122,9 +122,18 @@ impl JsonApiDocument {
         !self.included.is_none()
     }
     fn has_data(&self) -> bool {
-        match self.data {
-            PrimaryData::None => false,
-            _ => true,
+        !self.data.is_none()
+            false
+        } else {
+            match self.data {
+                Some(ref d) => {
+                    match d {
+                        &PrimaryData::None => false,
+                        _ => true,
+                    }
+                }
+                None => false,
+            }
         }
     }
     pub fn is_valid(&self) -> bool {
