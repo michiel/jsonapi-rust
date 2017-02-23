@@ -56,7 +56,7 @@ pub enum IdentifierData {
 /// The optional field `included` may only be present if the `data` field is present too.
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiDocument {
-    pub data: PrimaryData,
+    pub data: Option<PrimaryData>,
     pub included: Option<Resources>,
     pub links: Option<Links>,
     pub meta: Option<Meta>,
@@ -70,6 +70,7 @@ pub struct ErrorSource {
     pub parameter: Option<String>,
 }
 
+/// JSON-API Error
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiError {
     pub id: String,
@@ -82,6 +83,7 @@ pub struct JsonApiError {
     pub meta: Option<Meta>,
 }
 
+/// Optional JsonApiDocument payload identifying the JSON-API version the server implements
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiInfo {
     pub version: Option<String>,
@@ -122,11 +124,22 @@ impl JsonApiDocument {
         !self.included.is_none()
     }
     fn has_data(&self) -> bool {
-        match self.data {
-            PrimaryData::None => false,
-            _ => true,
+        if self.data.is_none() {
+            false
+        } else {
+            match self.data {
+                Some(ref d) => {
+                    match d {
+                        &PrimaryData::None => false,
+                        _ => true,
+                    }
+                }
+                None => false,
+            }
         }
     }
+    /// This function returns `false` if the `JsonApiDocument` contains any violations of the
+    /// specification. See `DocumentValidationError`
     pub fn is_valid(&self) -> bool {
         match self.validate() {
             Some(_) => false,
@@ -134,6 +147,8 @@ impl JsonApiDocument {
         }
     }
 
+    /// This function returns a `Vec` with identified specification violations enumerated in
+    /// `DocumentValidationError`
     pub fn validate(&self) -> Option<Vec<DocumentValidationError>> {
 
         let mut errors = Vec::<DocumentValidationError>::new();
@@ -158,6 +173,7 @@ impl JsonApiDocument {
     }
 }
 
+/// Top-level (Document) JSON-API specification violations
 #[derive(Debug, PartialEq)]
 pub enum DocumentValidationError {
     IncludedWithoutData,
