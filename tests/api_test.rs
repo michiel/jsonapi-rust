@@ -163,7 +163,15 @@ fn error_from_json_string() {
         "#;
     let error: Result<JsonApiError, serde_json::Error> = serde_json::from_str(&serialized);
     assert_eq!(error.is_ok(), true);
-    assert_eq!(error.unwrap().id, "1");
+    match error {
+        Ok(jsonapierror) => {
+            match jsonapierror.id {
+                Some(id) => assert_eq!(id, "1"),
+                None => assert!(false),
+            }
+        }
+        Err(_) => assert!(false),
+    }
 }
 
 #[test]
