@@ -64,9 +64,6 @@ pub enum IdentifierData {
 }
 
 /// The specification refers to this as a top-level `document`
-/// The spec dictates that the document must have least one of `data`, `errors` or `meta`.
-/// Of these, `data` and `errors` must not co-exist.
-/// The optional field `included` may only be present if the `data` field is present too.
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiDocument {
     pub data: Option<PrimaryData>,
@@ -145,6 +142,10 @@ impl JsonApiDocument {
     }
     /// This function returns `false` if the `JsonApiDocument` contains any violations of the
     /// specification. See `DocumentValidationError`
+    ///
+    /// The spec dictates that the document must have least one of `data`, `errors` or `meta`.
+    /// Of these, `data` and `errors` must not co-exist.
+    /// The optional field `included` may only be present if the `data` field is present too.
     ///
     /// ```
     /// use jsonapi::api::{JsonApiDocument, PrimaryData, JsonApiErrors};
