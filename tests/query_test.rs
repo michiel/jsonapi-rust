@@ -49,3 +49,126 @@ fn can_parse() {
     }
 
 }
+
+#[test]
+fn can_generate_string_empty() {
+    let query = Query {
+        _type: format!("none"),
+        include: None,
+        fields: None,
+        page: None,
+    };
+
+    let query_string = query.to_params();
+
+    assert_eq!(query_string, "");
+}
+
+#[test]
+fn can_generate_string_include() {
+    let query = Query {
+        _type: format!("none"),
+        include: Some(vec!["author".into()]),
+        fields: None,
+        page: None,
+    };
+
+    let query_string = query.to_params();
+
+    assert_eq!(query_string, "include=author");
+}
+
+#[test]
+fn can_generate_string_include_multiple() {
+    let query = Query {
+        _type: format!("none"),
+        include: Some(vec!["author".into(), "publisher".into()]),
+        fields: None,
+        page: None,
+    };
+
+    let query_string = query.to_params();
+
+    assert_eq!(query_string, "include=author,publisher");
+}
+
+#[test]
+fn can_generate_string_fields() {
+    type VecOfStrings = Vec<String>;
+    let mut fields = std::collections::HashMap::<String, VecOfStrings>::new();
+
+    fields.insert("user".into(), vec!["name".into()]);
+
+    let query = Query {
+        _type: format!("none"),
+        include: None,
+        fields: Some(fields),
+        page: None,
+    };
+
+    let query_string = query.to_params();
+
+    assert_eq!(query_string, "fields[user]=name");
+}
+
+#[test]
+fn can_generate_string_fields_multiple_values() {
+    type VecOfStrings = Vec<String>;
+    let mut fields = std::collections::HashMap::<String, VecOfStrings>::new();
+
+    fields.insert("user".into(), vec!["name".into(), "dateofbirth".into()]);
+
+    let query = Query {
+        _type: format!("none"),
+        include: None,
+        fields: Some(fields),
+        page: None,
+    };
+
+    let query_string = query.to_params();
+
+    assert_eq!(query_string, "fields[user]=name,dateofbirth");
+}
+
+#[test]
+fn can_generate_string_fields_multiple_key_and_values() {
+    type VecOfStrings = Vec<String>;
+    let mut fields = std::collections::HashMap::<String, VecOfStrings>::new();
+
+    fields.insert("item".into(), vec!["title".into(), "description".into()]);
+    fields.insert("user".into(), vec!["name".into(), "dateofbirth".into()]);
+
+    let query = Query {
+        _type: format!("none"),
+        include: None,
+        fields: Some(fields),
+        page: None,
+    };
+
+    let query_string = query.to_params();
+
+    //
+    // We don't have any guarantees on the order in which fields are output
+    //
+
+    assert!(query_string.eq("fields[item]=title,description&fields[user]=name,dateofbirth") ||
+            query_string.eq("fields[user]=name,dateofbirth&fields[item]=title,description"));
+}
+
+#[test]
+fn can_generate_page_fields() {
+
+    let query = Query {
+        _type: format!("none"),
+        include: None,
+        fields: None,
+        page: Some(PageQuery {
+            size: 5,
+            number: 10,
+        }),
+    };
+
+    let query_string = query.to_params();
+
+    assert_eq!(query_string, "page[size]=5&page[number]=10");
+}
