@@ -73,14 +73,15 @@ pub struct ErrorSource {
 }
 
 /// JSON-API Error
+/// All fields are optional
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiError {
-    pub id: String,
-    pub links: Links,
-    pub status: String,
-    pub code: String,
-    pub title: String,
-    pub detail: String,
+    pub id: Option<String>,
+    pub links: Option<Links>,
+    pub status: Option<String>,
+    pub code: Option<String>,
+    pub title: Option<String>,
+    pub detail: Option<String>,
     pub source: Option<ErrorSource>,
     pub meta: Option<Meta>,
 }

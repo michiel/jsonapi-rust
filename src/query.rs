@@ -8,20 +8,6 @@ pub struct PageQuery {
 }
 
 /// JSON-API Query parameters
-///
-/// ```
-/// use jsonapi::query::Query;
-/// let query = Query::from_params("include=author&fields[articles]=title,\
-///                                 body&fields[people]=name&page[number]=3&page[size]=1");
-/// match query.include {
-///     None => assert!(false),
-///     Some(include) => {
-///         assert_eq!(include.len(), 1);
-///         assert_eq!(include[0], "author");
-///     }
-/// }
-///
-/// ```
 #[derive(Debug, PartialEq)]
 pub struct Query {
     pub _type: String,
@@ -30,7 +16,24 @@ pub struct Query {
     pub page: Option<PageQuery>,
 }
 
+/// JSON-API Query parameters
 impl Query {
+    ///
+    /// Takes a query parameter string and returns a Query
+    ///
+    /// ```
+    /// use jsonapi::query::Query;
+    /// let query = Query::from_params("include=author&fields[articles]=title,\
+    ///                                 body&fields[people]=name&page[number]=3&page[size]=1");
+    /// match query.include {
+    ///     None => assert!(false),
+    ///     Some(include) => {
+    ///         assert_eq!(include.len(), 1);
+    ///         assert_eq!(include[0], "author");
+    ///     }
+    /// }
+    ///
+    /// ```
     pub fn from_params(params: &str) -> Self {
 
         match parse(params) {
@@ -114,5 +117,62 @@ impl Query {
                 }
             }
         }
+    }
+
+    ///
+    /// Builds a query parameter string from a Query
+    ///
+    /// ```
+    /// use jsonapi::query::Query;
+    /// let query = Query {
+    ///   _type: format!("none"),
+    ///   include: Some(vec!["author".into()]),
+    ///   fields: None,
+    ///   page: None,
+    /// };
+    /// match query.include {
+    ///     None => assert!(false),
+    ///     Some(include) => {
+    ///         assert_eq!(include.len(), 1);
+    ///         assert_eq!(include[0], "author");
+    ///     }
+    /// }
+    ///
+    /// ```
+    pub fn to_params(&self) -> String {
+        let mut params = Vec::<String>::new();
+
+        match self.include {
+            Some(ref include) => params.push(format!("include={}", include.join(","))),
+            None => (),
+        }
+
+        // Examples from json-api.org,
+        // fields[articles]=title,body,author&fields[people]=name
+        // fields[articles]=title,body&fields[people]=name
+
+        match self.fields {
+            Some(ref fields) => {
+                for (name, ref val) in fields.iter() {
+                    params.push(format!("fields[{}]={}", name, val.join(",")));
+                }
+            }
+            None => (),
+        }
+
+        match self.page {
+            Some(ref page) => {
+                params.push(page.to_params());
+            }
+            None => (),
+        }
+
+        params.join("&")
+    }
+}
+
+impl PageQuery {
+    pub fn to_params(&self) -> String {
+        format!("page[size]={}&page[number]={}", self.size, self.number)
     }
 }
