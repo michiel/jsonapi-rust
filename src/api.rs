@@ -1,16 +1,25 @@
 use serde_json;
 use std::collections::HashMap;
 
+/// Permitted JSON-API values (all JSON Values)
 pub type JsonApiValue = serde_json::Value;
+/// Vector of Resource
 pub type Resources = Vec<Resource>;
+/// Vector of ResourceIdentifiers
 pub type ResourceIdentifiers = Vec<ResourceIdentifier>;
 pub type Links = HashMap<String, JsonApiValue>;
+/// Meta-data object, can contain any data
 pub type Meta = HashMap<String, JsonApiValue>;
+/// Resource Attributes, can be any JSON value
 pub type ResourceAttributes = HashMap<String, JsonApiValue>;
+/// Map of relationships with other objects
 pub type Relationships = HashMap<String, Relationship>;
+/// Side-loaded Resources
 pub type Included = Vec<Resource>;
+/// Data-related errors
 pub type JsonApiErrors = Vec<JsonApiError>;
 
+/// Resource Identifier
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct ResourceIdentifier {
     #[serde(rename = "type")]
@@ -18,7 +27,6 @@ pub struct ResourceIdentifier {
     pub id: String,
 }
 
-///
 /// JSON-API Resource
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Resource {
@@ -30,12 +38,14 @@ pub struct Resource {
     pub links: Option<Links>,
 }
 
+/// Relationship with another object
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct Relationship {
     pub data: IdentifierData,
     pub links: Option<Links>,
 }
 
+/// Valid data Resource (can be None)
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(untagged)]
 pub enum PrimaryData {
@@ -44,6 +54,7 @@ pub enum PrimaryData {
     Multiple(Resources),
 }
 
+/// Valid Resource Identifier (can be None)
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 #[serde(untagged)]
 pub enum IdentifierData {
@@ -53,9 +64,6 @@ pub enum IdentifierData {
 }
 
 /// The specification refers to this as a top-level `document`
-/// The spec dictates that the document must have least one of `data`, `errors` or `meta`.
-/// Of these, `data` and `errors` must not co-exist.
-/// The optional field `included` may only be present if the `data` field is present too.
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiDocument {
     pub data: Option<PrimaryData>,
@@ -66,6 +74,7 @@ pub struct JsonApiDocument {
     pub jsonapi: Option<JsonApiInfo>,
 }
 
+/// Error location
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct ErrorSource {
     pub pointer: Option<String>,
@@ -93,6 +102,7 @@ pub struct JsonApiInfo {
     pub meta: Option<Meta>,
 }
 
+/// Pagination links
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Pagination {
     pub first: Option<String>,
@@ -132,6 +142,10 @@ impl JsonApiDocument {
     }
     /// This function returns `false` if the `JsonApiDocument` contains any violations of the
     /// specification. See `DocumentValidationError`
+    ///
+    /// The spec dictates that the document must have least one of `data`, `errors` or `meta`.
+    /// Of these, `data` and `errors` must not co-exist.
+    /// The optional field `included` may only be present if the `data` field is present too.
     ///
     /// ```
     /// use jsonapi::api::{JsonApiDocument, PrimaryData, JsonApiErrors};
