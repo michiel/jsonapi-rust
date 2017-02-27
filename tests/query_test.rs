@@ -162,7 +162,7 @@ fn can_generate_page_fields() {
         _type: format!("none"),
         include: None,
         fields: None,
-        page: Some(PageQuery {
+        page: Some(PageParams {
             size: 5,
             number: 10,
         }),

@@ -2,7 +2,7 @@ use queryst::parse;
 use std::collections::HashMap;
 
 #[derive(Debug, PartialEq)]
-pub struct PageQuery {
+pub struct PageParams {
     pub size: i64,
     pub number: i64,
 }
@@ -13,7 +13,7 @@ pub struct Query {
     pub _type: String,
     pub include: Option<Vec<String>>,
     pub fields: Option<HashMap<String, Vec<String>>>,
-    pub page: Option<PageQuery>,
+    pub page: Option<PageParams>,
 }
 
 /// JSON-API Query parameters
@@ -71,7 +71,7 @@ impl Query {
                     println!("No fields found in {:?}", x);
                 });
 
-                let page = PageQuery {
+                let page = PageParams {
                     number: match o.find_path(&["page", "number"]) {
                         None => 0,
                         Some(num) => {
@@ -123,12 +123,12 @@ impl Query {
     /// Builds a query parameter string from a Query
     ///
     /// ```
-    /// use jsonapi::query::{Query, PageQuery};
+    /// use jsonapi::query::{Query, PageParams};
     /// let query = Query {
     ///   _type: format!("none"),
     ///   include: Some(vec!["author".into()]),
     ///   fields: None,
-    ///   page: Some(PageQuery {
+    ///   page: Some(PageParams {
     ///     size: 5,
     ///     number: 10,
     ///   }),
@@ -170,7 +170,7 @@ impl Query {
     }
 }
 
-impl PageQuery {
+impl PageParams {
     pub fn to_params(&self) -> String {
         format!("page[size]={}&page[number]={}", self.size, self.number)
     }
