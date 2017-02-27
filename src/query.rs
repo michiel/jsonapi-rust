@@ -123,20 +123,19 @@ impl Query {
     /// Builds a query parameter string from a Query
     ///
     /// ```
-    /// use jsonapi::query::Query;
+    /// use jsonapi::query::{Query, PageQuery};
     /// let query = Query {
     ///   _type: format!("none"),
     ///   include: Some(vec!["author".into()]),
     ///   fields: None,
-    ///   page: None,
+    ///   page: Some(PageQuery {
+    ///     size: 5,
+    ///     number: 10,
+    ///   }),
     /// };
-    /// match query.include {
-    ///     None => assert!(false),
-    ///     Some(include) => {
-    ///         assert_eq!(include.len(), 1);
-    ///         assert_eq!(include[0], "author");
-    ///     }
-    /// }
+    ///
+    /// let query_string = query.to_params();
+    /// assert_eq!(query_string, "include=author&page[size]=5&page[number]=10");
     ///
     /// ```
     pub fn to_params(&self) -> String {
