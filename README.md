@@ -11,9 +11,11 @@ This is an implementation of the JSON-API v1 specification at [jsonapi.org](http
 Add this crate to your _Cargo.toml_ file,
 
     [dependencies]
-    jsonapi = "0.1.0"
+    jsonapi = "0.3.0"
 
-## Test
+Examples of most serialization and deserialization cases can be found in the [_tests/_ directory](https://github.com/michiel/jsonapi-rust/tree/master/tests) or the [documentation](https://michiel.github.io/jsonapi-rust/).
+
+## Development
 
 The command `cargo test` will run all tests. For more verbose output or output with _cargo watch_,
 
