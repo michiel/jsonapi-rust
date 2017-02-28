@@ -1,0 +1,14 @@
+[clog]
+repository = "https://github.com/michiel/jsonapi-rust"
+link-style = "github"
+changelog = "CHANGELOG.md"
+output-format = "markdown"
+# from-latest-tag = true
+
+[sections]
+Features = ["feat", "feature"]
+Bugfixes = ["bug", "bugs", "bugfix"]
+# Documentation = ["doc", "docs"]
+# Tests = ["test", "tests"]
+# Non-Functional = ["refactor"]
+
