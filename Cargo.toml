@@ -1,6 +1,6 @@
 [package]
 name = "jsonapi"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Michiel Kalkman <michiel@nosuchtype.com>"]
 description = "JSONAPI implementation"
 documentation = "https://michiel.github.io/jsonapi-rust/jsonapi/index.html"
