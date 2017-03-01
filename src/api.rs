@@ -237,10 +237,61 @@ impl JsonApiDocument {
     }
 }
 
+impl Resource {
+    pub fn get_relationship(&self, name: &str) -> Option<&Relationship> {
+        match self.relationships {
+            None => None,
+            Some(ref relationships) => {
+                match relationships.get(name) {
+                    None => None,
+                    Some(rel) => Some(rel),
+                }
+            }
+        }
+    }
+
+    pub fn get_attribute_as_string(&self, attr: &str) -> Result<String, JsonApiDataError> {
+        match self.attributes.get(attr) {
+            None => Err(JsonApiDataError::AttributeNotFound),
+            Some(json_attr) => {
+                match json_attr.as_str() {
+                    None => Err(JsonApiDataError::IncompatibleAttributeType),
+                    Some(s) => Ok(s.into()),
+                }
+            }
+        }
+
+    }
+
+    /*
+    pub fn get_relationship_id(&self, name: &str) -> Option<&i64> {
+        match self.get_relationship(name) {
+            None => None,
+            Some(rel) => {
+                match rel.data {
+                    None => None,
+                    Single(resource_identifier) => Some(resource_identifier.id),
+                    Multiple(_) => {
+                        println!("Relationship is not 1");
+                        None
+                    }
+                }
+            }
+        }
+    }
+    */
+}
+
 /// Top-level (Document) JSON-API specification violations
 #[derive(Debug, PartialEq)]
 pub enum DocumentValidationError {
     IncludedWithoutData,
     DataWithErrors,
     MissingContent,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum JsonApiDataError {
+    AttributeNotFound,
+    IncompatibleAttributeType,
 }
