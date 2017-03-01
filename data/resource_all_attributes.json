@@ -1,0 +1,13 @@
+{
+  "type": "articles",
+  "id": "1",
+  "attributes": {
+    "title": "Rails is Omakase",
+    "likes": 250,
+    "published": true,
+    "draft": false
+  },
+  "links": {
+    "self": "http://example.com/articles/1"
+  }
+}

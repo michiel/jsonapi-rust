@@ -20,7 +20,7 @@ pub type Included = Vec<Resource>;
 pub type JsonApiErrors = Vec<JsonApiError>;
 
 pub type JsonApiId = String;
-pub type JsonApiIds = Vec<JsonApiId>;
+pub type JsonApiIds<'a> = Vec<&'a JsonApiId>;
 
 /// Resource Identifier
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -263,6 +263,18 @@ impl Resource {
                 }
             }
         }
+    }
+
+    pub fn get_attribute_as_i64(&self, attr: &str) -> Result<i64, JsonApiDataError> {
+        match self.attributes.get(attr) {
+            None => Err(JsonApiDataError::AttributeNotFound),
+            Some(json_attr) => {
+                match json_attr.as_i64() {
+                    None => Err(JsonApiDataError::IncompatibleAttributeType),
+                    Some(s) => Ok(s.into()),
+                }
+            }
+        }
 
     }
 }
@@ -280,9 +292,7 @@ impl Relationship {
         match self.data {
             IdentifierData::None => Ok(None),
             IdentifierData::Single(_) => Err(RelationshipAssumptionError::RelationshipIsNotAList),
-            IdentifierData::Multiple(ref data) => {
-                Ok(Some(data.iter().map(|x| x.id.clone()).collect::<Vec<_>>()))
-            }
+            IdentifierData::Multiple(ref data) => Ok(Some(data.iter().map(|x| &x.id).collect())),
         }
     }
 }
