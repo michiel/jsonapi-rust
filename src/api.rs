@@ -19,12 +19,15 @@ pub type Included = Vec<Resource>;
 /// Data-related errors
 pub type JsonApiErrors = Vec<JsonApiError>;
 
+pub type JsonApiId = String;
+pub type JsonApiIds = Vec<JsonApiId>;
+
 /// Resource Identifier
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct ResourceIdentifier {
     #[serde(rename = "type")]
     pub _type: String,
-    pub id: String,
+    pub id: JsonApiId,
 }
 
 /// JSON-API Resource
@@ -32,7 +35,7 @@ pub struct ResourceIdentifier {
 pub struct Resource {
     #[serde(rename = "type")]
     pub _type: String,
-    pub id: String,
+    pub id: JsonApiId,
     pub attributes: ResourceAttributes,
     pub relationships: Option<Relationships>,
     pub links: Option<Links>,
@@ -262,24 +265,26 @@ impl Resource {
         }
 
     }
+}
 
-    /*
-    pub fn get_relationship_id(&self, name: &str) -> Option<&i64> {
-        match self.get_relationship(name) {
-            None => None,
-            Some(rel) => {
-                match rel.data {
-                    None => None,
-                    Single(resource_identifier) => Some(resource_identifier.id),
-                    Multiple(_) => {
-                        println!("Relationship is not 1");
-                        None
-                    }
-                }
+impl Relationship {
+    pub fn as_id(&self) -> Result<Option<&JsonApiId>, RelationshipAssumptionError> {
+        match self.data {
+            IdentifierData::None => Ok(None),
+            IdentifierData::Multiple(_) => Err(RelationshipAssumptionError::RelationshipIsAList),
+            IdentifierData::Single(ref data) => Ok(Some(&data.id)),
+        }
+    }
+
+    pub fn as_ids(&self) -> Result<Option<JsonApiIds>, RelationshipAssumptionError> {
+        match self.data {
+            IdentifierData::None => Ok(None),
+            IdentifierData::Single(_) => Err(RelationshipAssumptionError::RelationshipIsNotAList),
+            IdentifierData::Multiple(ref data) => {
+                Ok(Some(data.iter().map(|x| x.id.clone()).collect::<Vec<_>>()))
             }
         }
     }
-    */
 }
 
 /// Top-level (Document) JSON-API specification violations
@@ -294,4 +299,10 @@ pub enum DocumentValidationError {
 pub enum JsonApiDataError {
     AttributeNotFound,
     IncompatibleAttributeType,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum RelationshipAssumptionError {
+    RelationshipIsAList,
+    RelationshipIsNotAList,
 }
