@@ -9,14 +9,14 @@ use helper::read_json_file;
 #[test]
 fn it_works() {
     let resource = Resource {
-        _type: format!("test"),
-        id: format!("123"),
+        _type: "test".into(),
+        id: "123".into(),
         attributes: ResourceAttributes::new(),
         relationships: Some(Relationships::new()),
         links: None,
     };
 
-    assert_eq!(resource.id, format!("123"));
+    assert_eq!(resource.id, "123");
 
     let serialized = serde_json::to_string(&resource).unwrap();
     let deserialized: Resource = serde_json::from_str(&serialized).unwrap();
@@ -39,8 +39,8 @@ fn it_works() {
 #[test]
 fn jsonapi_document_can_be_valid() {
     let resource = Resource {
-        _type: format!("test"),
-        id: format!("123"),
+        _type: "test".into(),
+        id: "123".into(),
         attributes: ResourceAttributes::new(),
         relationships: Some(Relationships::new()),
         links: None,
@@ -75,16 +75,16 @@ fn jsonapi_document_can_be_valid() {
 fn jsonapi_document_invalid_errors() {
 
     let resource = Resource {
-        _type: format!("test"),
-        id: format!("123"),
+        _type: "test".into(),
+        id: "123".into(),
         attributes: ResourceAttributes::new(),
         relationships: Some(Relationships::new()),
         links: None,
     };
 
     let included_resource = Resource {
-        _type: format!("test"),
-        id: format!("123"),
+        _type: "test".into(),
+        id: "123".into(),
         attributes: ResourceAttributes::new(),
         relationships: Some(Relationships::new()),
         links: None,

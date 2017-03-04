@@ -3,9 +3,10 @@ use std::collections::HashMap;
 
 /// Permitted JSON-API values (all JSON Values)
 pub type JsonApiValue = serde_json::Value;
-/// Vector of Resource
+
+/// Vector of `Resource`
 pub type Resources = Vec<Resource>;
-/// Vector of ResourceIdentifiers
+/// Vector of `ResourceIdentifiers`
 pub type ResourceIdentifiers = Vec<ResourceIdentifier>;
 pub type Links = HashMap<String, JsonApiValue>;
 /// Meta-data object, can contain any data
@@ -98,7 +99,7 @@ pub struct JsonApiError {
     pub meta: Option<Meta>,
 }
 
-/// Optional JsonApiDocument payload identifying the JSON-API version the server implements
+/// Optional `JsonApiDocument` payload identifying the JSON-API version the server implements
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiInfo {
     pub version: Option<String>,
@@ -235,8 +236,7 @@ impl JsonApiDocument {
     /// assert_eq!(doc.is_ok(), true);
     /// ```
     pub fn from_str(s: &str) -> Result<Self, serde_json::Error> {
-        let data: Result<Self, serde_json::Error> = serde_json::from_str(&s);
-        data
+        serde_json::from_str(&s)
     }
 }
 
