@@ -24,3 +24,12 @@ The command `cargo test` will run all tests. For more verbose output or output w
 
     RUST_BACKTRACE=1 cargo test -- --nocapture
     RUST_BACKTRACE=1 cargo watch "test -- --nocapture"
+
+### Clippy
+
+To run clippy, find a last known working version of nightly that runs with clippy,
+
+    rustup install nightly-2017-03-01
+    rustup run nightly-2017-03-01 cargo install clippy
+    rustup run nightly-2017-03-01 cargo clippy
+
