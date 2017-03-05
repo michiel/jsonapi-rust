@@ -14,7 +14,7 @@ This is an implementation of the JSON-API v1 specification at [jsonapi.org](http
 Add this crate to your _Cargo.toml_ file,
 
     [dependencies]
-    jsonapi = "0.3.0"
+    jsonapi = "*"
 
 Examples of most serialization and deserialization cases can be found in the [_tests/_](https://github.com/michiel/jsonapi-rust/tree/master/tests) directory or the [documentation](https://docs.rs/jsonapi).
 
