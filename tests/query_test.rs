@@ -53,7 +53,7 @@ fn can_parse() {
 #[test]
 fn can_generate_string_empty() {
     let query = Query {
-        _type: format!("none"),
+        _type: "none".into(),
         include: None,
         fields: None,
         page: None,
@@ -67,7 +67,7 @@ fn can_generate_string_empty() {
 #[test]
 fn can_generate_string_include() {
     let query = Query {
-        _type: format!("none"),
+        _type: "none".into(),
         include: Some(vec!["author".into()]),
         fields: None,
         page: None,
@@ -81,7 +81,7 @@ fn can_generate_string_include() {
 #[test]
 fn can_generate_string_include_multiple() {
     let query = Query {
-        _type: format!("none"),
+        _type: "none".into(),
         include: Some(vec!["author".into(), "publisher".into()]),
         fields: None,
         page: None,
@@ -100,7 +100,7 @@ fn can_generate_string_fields() {
     fields.insert("user".into(), vec!["name".into()]);
 
     let query = Query {
-        _type: format!("none"),
+        _type: "none".into(),
         include: None,
         fields: Some(fields),
         page: None,
@@ -119,7 +119,7 @@ fn can_generate_string_fields_multiple_values() {
     fields.insert("user".into(), vec!["name".into(), "dateofbirth".into()]);
 
     let query = Query {
-        _type: format!("none"),
+        _type: "none".into(),
         include: None,
         fields: Some(fields),
         page: None,
@@ -139,7 +139,7 @@ fn can_generate_string_fields_multiple_key_and_values() {
     fields.insert("user".into(), vec!["name".into(), "dateofbirth".into()]);
 
     let query = Query {
-        _type: format!("none"),
+        _type: "none".into(),
         include: None,
         fields: Some(fields),
         page: None,
@@ -147,7 +147,6 @@ fn can_generate_string_fields_multiple_key_and_values() {
 
     let query_string = query.to_params();
 
-    //
     // We don't have any guarantees on the order in which fields are output
     //
 
@@ -159,7 +158,7 @@ fn can_generate_string_fields_multiple_key_and_values() {
 fn can_generate_page_fields() {
 
     let query = Query {
-        _type: format!("none"),
+        _type: "none".into(),
         include: None,
         fields: None,
         page: Some(PageParams {

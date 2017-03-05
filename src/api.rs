@@ -3,9 +3,10 @@ use std::collections::HashMap;
 
 /// Permitted JSON-API values (all JSON Values)
 pub type JsonApiValue = serde_json::Value;
-/// Vector of Resource
+
+/// Vector of `Resource`
 pub type Resources = Vec<Resource>;
-/// Vector of ResourceIdentifiers
+/// Vector of `ResourceIdentifiers`
 pub type ResourceIdentifiers = Vec<ResourceIdentifier>;
 pub type Links = HashMap<String, JsonApiValue>;
 /// Meta-data object, can contain any data
@@ -19,12 +20,15 @@ pub type Included = Vec<Resource>;
 /// Data-related errors
 pub type JsonApiErrors = Vec<JsonApiError>;
 
+pub type JsonApiId = String;
+pub type JsonApiIds<'a> = Vec<&'a JsonApiId>;
+
 /// Resource Identifier
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct ResourceIdentifier {
     #[serde(rename = "type")]
     pub _type: String,
-    pub id: String,
+    pub id: JsonApiId,
 }
 
 /// JSON-API Resource
@@ -32,7 +36,7 @@ pub struct ResourceIdentifier {
 pub struct Resource {
     #[serde(rename = "type")]
     pub _type: String,
-    pub id: String,
+    pub id: JsonApiId,
     pub attributes: ResourceAttributes,
     pub relationships: Option<Relationships>,
     pub links: Option<Links>,
@@ -95,7 +99,7 @@ pub struct JsonApiError {
     pub meta: Option<Meta>,
 }
 
-/// Optional JsonApiDocument payload identifying the JSON-API version the server implements
+/// Optional `JsonApiDocument` payload identifying the JSON-API version the server implements
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct JsonApiInfo {
     pub version: Option<String>,
@@ -232,8 +236,64 @@ impl JsonApiDocument {
     /// assert_eq!(doc.is_ok(), true);
     /// ```
     pub fn from_str(s: &str) -> Result<Self, serde_json::Error> {
-        let data: Result<Self, serde_json::Error> = serde_json::from_str(&s);
-        data
+        serde_json::from_str(&s)
+    }
+}
+
+impl Resource {
+    pub fn get_relationship(&self, name: &str) -> Option<&Relationship> {
+        match self.relationships {
+            None => None,
+            Some(ref relationships) => {
+                match relationships.get(name) {
+                    None => None,
+                    Some(rel) => Some(rel),
+                }
+            }
+        }
+    }
+
+    pub fn get_attribute_as_string(&self, attr: &str) -> Result<String, JsonApiDataError> {
+        match self.attributes.get(attr) {
+            None => Err(JsonApiDataError::AttributeNotFound),
+            Some(json_attr) => {
+                match json_attr.as_str() {
+                    None => Err(JsonApiDataError::IncompatibleAttributeType),
+                    Some(s) => Ok(s.into()),
+                }
+            }
+        }
+    }
+
+    pub fn get_attribute_as_i64(&self, attr: &str) -> Result<i64, JsonApiDataError> {
+        match self.attributes.get(attr) {
+            None => Err(JsonApiDataError::AttributeNotFound),
+            Some(json_attr) => {
+                match json_attr.as_i64() {
+                    None => Err(JsonApiDataError::IncompatibleAttributeType),
+                    Some(s) => Ok(s.into()),
+                }
+            }
+        }
+
+    }
+}
+
+impl Relationship {
+    pub fn as_id(&self) -> Result<Option<&JsonApiId>, RelationshipAssumptionError> {
+        match self.data {
+            IdentifierData::None => Ok(None),
+            IdentifierData::Multiple(_) => Err(RelationshipAssumptionError::RelationshipIsAList),
+            IdentifierData::Single(ref data) => Ok(Some(&data.id)),
+        }
+    }
+
+    pub fn as_ids(&self) -> Result<Option<JsonApiIds>, RelationshipAssumptionError> {
+        match self.data {
+            IdentifierData::None => Ok(None),
+            IdentifierData::Single(_) => Err(RelationshipAssumptionError::RelationshipIsNotAList),
+            IdentifierData::Multiple(ref data) => Ok(Some(data.iter().map(|x| &x.id).collect())),
+        }
     }
 }
 
@@ -243,4 +303,16 @@ pub enum DocumentValidationError {
     IncludedWithoutData,
     DataWithErrors,
     MissingContent,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum JsonApiDataError {
+    AttributeNotFound,
+    IncompatibleAttributeType,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum RelationshipAssumptionError {
+    RelationshipIsAList,
+    RelationshipIsNotAList,
 }

@@ -13,3 +13,4 @@ extern crate queryst;
 
 pub mod api;
 pub mod query;
+pub mod model;
