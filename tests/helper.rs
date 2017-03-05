@@ -13,9 +13,9 @@ pub fn read_json_file(filename: &str) -> String {
     };
 
     let mut s = String::new();
-    match file.read_to_string(&mut s) {
-        Err(why) => panic!("couldn't read {}: {}", display, Error::description(&why)),
-        Ok(_) => {}
+
+    if let Err(why) = file.read_to_string(&mut s) {
+        panic!("couldn't read {}: {}", display, Error::description(&why));
     };
 
     s

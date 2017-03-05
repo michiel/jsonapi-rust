@@ -161,7 +161,7 @@ fn error_from_json_string() {
     let serialized = r#"
         {"id":"1", "links" : {}, "status" : "unknown", "code" : "code1", "title" : "error-title", "detail": "error-detail"}
         "#;
-    let error: Result<JsonApiError, serde_json::Error> = serde_json::from_str(&serialized);
+    let error: Result<JsonApiError, serde_json::Error> = serde_json::from_str(serialized);
     assert_eq!(error.is_ok(), true);
     match error {
         Ok(jsonapierror) => {
@@ -178,7 +178,7 @@ fn error_from_json_string() {
 fn single_resource_from_json_string() {
     let serialized =
         r#"{ "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} }"#;
-    let data: Result<Resource, serde_json::Error> = serde_json::from_str(&serialized);
+    let data: Result<Resource, serde_json::Error> = serde_json::from_str(serialized);
     assert_eq!(data.is_ok(), true);
 }
 
@@ -189,7 +189,7 @@ fn multiple_resource_from_json_string() {
             { "id" :"2", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} },
             { "id" :"3", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} }
         ]"#;
-    let data: Result<Resources, serde_json::Error> = serde_json::from_str(&serialized);
+    let data: Result<Resources, serde_json::Error> = serde_json::from_str(serialized);
     assert_eq!(data.is_ok(), true);
 }
 
@@ -198,7 +198,7 @@ fn no_data_document_from_json_string() {
     let serialized = r#"{
             "data" : null
         }"#;
-    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&serialized);
+    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(serialized);
     assert_eq!(data.is_ok(), true);
 }
 
@@ -209,7 +209,7 @@ fn single_data_document_from_json_string() {
                 "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {}
             }
         }"#;
-    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&serialized);
+    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(serialized);
     assert_eq!(data.is_ok(), true);
 }
 
@@ -222,7 +222,7 @@ fn multiple_data_document_from_json_string() {
                 { "id" :"3", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} }
             ]
         }"#;
-    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&serialized);
+    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(serialized);
     assert_eq!(data.is_ok(), true);
 }
 
