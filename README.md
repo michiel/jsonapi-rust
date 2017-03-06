@@ -16,9 +16,16 @@ Add this crate to your _Cargo.toml_ file,
     [dependencies]
     jsonapi = "*"
 
+Using git
+
+    [dependencies]
+    jsonapi = { git = "https://github.com/michiel/jsonapi-rust", branch = "master" }
+
 Examples of most serialization and deserialization cases can be found in the [_tests/_](https://github.com/michiel/jsonapi-rust/tree/master/tests) directory or the [documentation](https://docs.rs/jsonapi).
 
 ## Development
+
+### Testing
 
 The command `cargo test` will run all tests. For more verbose output or output with _cargo watch_,
 
