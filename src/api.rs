@@ -241,6 +241,29 @@ impl JsonApiDocument {
 }
 
 impl Resource {
+    /// Instantiate from string
+    ///
+    /// ```
+    /// use jsonapi::api::Resource;
+    ///
+    /// let serialized = r#"{
+    ///   "id":"1",
+    ///   "type":"post",
+    ///   "attributes":{
+    ///     "title": "Rails is Omakase",
+    ///     "likes": 250
+    ///   },
+    ///   "relationships":{},
+    ///   "links" :{}
+    /// }"#;
+    ///
+    /// let data = Resource::from_str(&serialized);
+    /// assert_eq!(data.is_ok(), true);
+    /// ```
+    pub fn from_str(s: &str) -> Result<Self, serde_json::Error> {
+        serde_json::from_str(&s)
+    }
+
     pub fn get_relationship(&self, name: &str) -> Option<&Relationship> {
         match self.relationships {
             None => None,
@@ -250,6 +273,45 @@ impl Resource {
                     Some(rel) => Some(rel),
                 }
             }
+        }
+    }
+
+    /// Get an attribute `JsonApiValue`
+    ///
+    /// ```
+    /// use jsonapi::api::Resource;
+    ///
+    /// let serialized = r#"{
+    ///   "id":"1",
+    ///   "type":"post",
+    ///   "attributes":{
+    ///     "title": "Rails is Omakase",
+    ///     "likes": 250
+    ///   },
+    ///   "relationships":{},
+    ///   "links" :{}
+    /// }"#;
+    ///
+    /// match Resource::from_str(&serialized) {
+    ///   Err(_)=> assert!(false),
+    ///   Ok(resource)=> {
+    ///     match resource.get_attribute("title") {
+    ///       None => assert!(false),
+    ///       Some(attr) => {
+    ///         match attr.as_str() {
+    ///           None => assert!(false),
+    ///           Some(s) => {
+    ///               assert_eq!(s, "Rails is Omakase");
+    ///           }
+    ///         }
+    ///       }
+    ///     }
+    ///   }
+    /// }
+    pub fn get_attribute(&self, name: &str) -> Option<&JsonApiValue> {
+        match self.attributes.get(name) {
+            None => None,
+            Some(val) => Some(&val),
         }
     }
 
@@ -275,7 +337,6 @@ impl Resource {
                 }
             }
         }
-
     }
 }
 
