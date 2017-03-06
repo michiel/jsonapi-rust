@@ -449,6 +449,19 @@ fn can_get_attribute() {
                 }
             }
 
+            match res.get_attribute("tags") {
+                None => assert!(false),
+                Some(val) => {
+                    match val.as_array() {
+                        None => assert!(false),
+                        Some(arr) => {
+                            assert_eq!(arr[0], "rails");
+                            assert_eq!(arr[1], "news");
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

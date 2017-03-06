@@ -5,7 +5,8 @@
     "title": "Rails is Omakase",
     "likes": 250,
     "published": true,
-    "draft": false
+    "draft": false,
+    "tags": ["rails", "news"]
   },
   "links": {
     "self": "http://example.com/articles/1"
