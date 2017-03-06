@@ -404,3 +404,64 @@ fn can_get_number_attribute() {
         }
     }
 }
+
+#[test]
+fn can_get_attribute() {
+    let s = ::read_json_file("data/resource_all_attributes.json");
+    let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
+    match data {
+        Err(_) => assert!(false),
+        Ok(res) => {
+            match res.get_attribute("likes") {
+                None => assert!(false),
+                Some(val) => {
+                    match val.as_i64() {
+                        None => assert!(false),
+                        Some(num) => {
+                            let x: i64 = 250;
+                            assert_eq!(num, x);
+                        }
+                    }
+                }
+            }
+
+            match res.get_attribute("title") {
+                None => assert!(false),
+                Some(val) => {
+                    match val.as_str() {
+                        None => assert!(false),
+                        Some(s) => {
+                            assert_eq!(s, "Rails is Omakase");
+                        }
+                    }
+                }
+            }
+
+            match res.get_attribute("published") {
+                None => assert!(false),
+                Some(val) => {
+                    match val.as_bool() {
+                        None => assert!(false),
+                        Some(b) => {
+                            assert_eq!(b, true);
+                        }
+                    }
+                }
+            }
+
+            match res.get_attribute("tags") {
+                None => assert!(false),
+                Some(val) => {
+                    match val.as_array() {
+                        None => assert!(false),
+                        Some(arr) => {
+                            assert_eq!(arr[0], "rails");
+                            assert_eq!(arr[1], "news");
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+}
