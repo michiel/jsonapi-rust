@@ -115,6 +115,22 @@ pub struct Pagination {
     pub last: Option<String>,
 }
 
+
+#[derive(Debug)]
+pub struct Patch {
+    pub patch_type: PatchType,
+    pub subject: String,
+    pub previous: JsonApiValue,
+    pub next: JsonApiValue,
+}
+
+#[derive(Debug)]
+pub struct PatchSet {
+    pub resource_type: String,
+    pub resource_id: String,
+    pub patches: Vec<Patch>,
+}
+
 impl Pagination {
     pub fn has_first(&self) -> bool {
         !self.first.is_none()
@@ -338,6 +354,14 @@ impl Resource {
             }
         }
     }
+
+    pub fn diff(&self, alt: Resource) -> Result<PatchSet, DiffPatchError> {
+        unimplemented!();
+    }
+
+    pub fn patch(&mut self, patchset: PatchSet) -> Result<(), DiffPatchError> {
+        unimplemented!();
+    }
 }
 
 impl Relationship {
@@ -376,4 +400,17 @@ pub enum JsonApiDataError {
 pub enum RelationshipAssumptionError {
     RelationshipIsAList,
     RelationshipIsNotAList,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum DiffPatchError {
+    IncompatibleType(String, String),
+    NonExistentProperty(String),
+    IncorrectPropertyValue(String),
+}
+
+#[derive(Debug, PartialEq)]
+pub enum PatchType {
+    Relationship,
+    Attribute,
 }
