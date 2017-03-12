@@ -131,6 +131,16 @@ pub struct PatchSet {
     pub patches: Vec<Patch>,
 }
 
+impl PatchSet {
+    pub fn new_for(resource: &Resource) -> Self {
+        PatchSet {
+            resource_type: resource._type.clone(),
+            resource_id: resource.id.clone(),
+            patches: Vec::<Patch>::new(),
+        }
+    }
+}
+
 impl Pagination {
     pub fn has_first(&self) -> bool {
         !self.first.is_none()
@@ -355,8 +365,30 @@ impl Resource {
         }
     }
 
-    pub fn diff(&self, alt: Resource) -> Result<PatchSet, DiffPatchError> {
-        unimplemented!();
+    pub fn diff(&self, other: Resource) -> Result<PatchSet, DiffPatchError> {
+        if self._type != other._type {
+            Err(DiffPatchError::IncompatibleTypes(self._type.clone(), other._type.clone()))
+        } else {
+
+            let mut self_keys: Vec<String> =
+                self.attributes.iter().map(|(key, _)| key.clone()).collect();
+
+            self_keys.sort();
+
+            let mut other_keys: Vec<String> =
+                other.attributes.iter().map(|(key, _)| key.clone()).collect();
+
+            other_keys.sort();
+
+            let matching = self_keys.iter().zip(other_keys.iter()).filter(|&(a, b)| a == b).count();
+
+            if matching != self_keys.len() {
+                Err(DiffPatchError::DifferentAttributeKeys)
+            } else {
+                let mut patchset = PatchSet::new_for(self);
+                Ok(patchset)
+            }
+        }
     }
 
     pub fn patch(&mut self, patchset: PatchSet) -> Result<(), DiffPatchError> {
@@ -404,7 +436,8 @@ pub enum RelationshipAssumptionError {
 
 #[derive(Debug, PartialEq)]
 pub enum DiffPatchError {
-    IncompatibleType(String, String),
+    IncompatibleTypes(String, String),
+    DifferentAttributeKeys,
     NonExistentProperty(String),
     IncorrectPropertyValue(String),
 }
