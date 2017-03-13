@@ -24,7 +24,7 @@ pub type JsonApiId = String;
 pub type JsonApiIds<'a> = Vec<&'a JsonApiId>;
 
 /// Resource Identifier
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct ResourceIdentifier {
     #[serde(rename = "type")]
     pub _type: String,
@@ -32,7 +32,7 @@ pub struct ResourceIdentifier {
 }
 
 /// JSON-API Resource
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Resource {
     #[serde(rename = "type")]
     pub _type: String,
@@ -43,14 +43,14 @@ pub struct Resource {
 }
 
 /// Relationship with another object
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Relationship {
     pub data: IdentifierData,
     pub links: Option<Links>,
 }
 
 /// Valid data Resource (can be None)
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
 pub enum PrimaryData {
     None,
@@ -59,7 +59,7 @@ pub enum PrimaryData {
 }
 
 /// Valid Resource Identifier (can be None)
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
 pub enum IdentifierData {
     None,
@@ -68,7 +68,7 @@ pub enum IdentifierData {
 }
 
 /// The specification refers to this as a top-level `document`
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct JsonApiDocument {
     pub data: Option<PrimaryData>,
     pub included: Option<Resources>,
@@ -79,7 +79,7 @@ pub struct JsonApiDocument {
 }
 
 /// Error location
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct ErrorSource {
     pub pointer: Option<String>,
     pub parameter: Option<String>,
@@ -87,7 +87,7 @@ pub struct ErrorSource {
 
 /// JSON-API Error
 /// All fields are optional
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct JsonApiError {
     pub id: Option<String>,
     pub links: Option<Links>,
@@ -100,7 +100,7 @@ pub struct JsonApiError {
 }
 
 /// Optional `JsonApiDocument` payload identifying the JSON-API version the server implements
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct JsonApiInfo {
     pub version: Option<String>,
     pub meta: Option<Meta>,
@@ -138,6 +138,10 @@ impl PatchSet {
             resource_id: resource.id.clone(),
             patches: Vec::<Patch>::new(),
         }
+    }
+
+    pub fn push(&mut self, patch: Patch) -> () {
+        self.patches.push(patch);
     }
 }
 
@@ -386,13 +390,37 @@ impl Resource {
                 Err(DiffPatchError::DifferentAttributeKeys)
             } else {
                 let mut patchset = PatchSet::new_for(self);
+
+                for (attr, self_value) in self.attributes.iter() {
+                    match other.attributes.get(attr) {
+                        None => {
+                            // XXX This should not happen
+                        }
+                        Some(other_value) => {
+                            if self_value.to_string() != other_value.to_string() {
+                                patchset.push(Patch {
+                                    patch_type: PatchType::Attribute,
+                                    subject: attr.clone(),
+                                    previous: self_value.clone(),
+                                    next: other_value.clone(),
+                                });
+                            }
+                        }
+                    }
+
+                }
+
                 Ok(patchset)
             }
         }
     }
 
-    pub fn patch(&mut self, patchset: PatchSet) -> Result<(), DiffPatchError> {
-        unimplemented!();
+    pub fn patch(&mut self, patchset: PatchSet) -> Result<Resource, DiffPatchError> {
+        let mut res = self.clone();
+        for patch in patchset.patches.iter() {
+            res.attributes.insert(patch.subject.clone(), patch.next.clone());
+        }
+        Ok(res)
     }
 }
 
@@ -415,26 +443,26 @@ impl Relationship {
 }
 
 /// Top-level (Document) JSON-API specification violations
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum DocumentValidationError {
     IncludedWithoutData,
     DataWithErrors,
     MissingContent,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum JsonApiDataError {
     AttributeNotFound,
     IncompatibleAttributeType,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum RelationshipAssumptionError {
     RelationshipIsAList,
     RelationshipIsNotAList,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum DiffPatchError {
     IncompatibleTypes(String, String),
     DifferentAttributeKeys,
@@ -442,7 +470,7 @@ pub enum DiffPatchError {
     IncorrectPropertyValue(String),
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum PatchType {
     Relationship,
     Attribute,

@@ -482,13 +482,11 @@ fn can_diff_resource() {
                 Err(_) => assert!(false),
                 Ok(res2) => {
                     match res1.diff(res2) {
-                        Err(err) => {
-                            println!("Error {:?}", err);
+                        Err(_) => {
                             assert!(false);
                         }
                         Ok(patchset) => {
-                            println!("Patchset {:?}", patchset);
-                            assert_eq!(patchset.patches.len(), 0);
+                            assert_eq!(patchset.patches.len(), 5);
                         }
                     }
                 }

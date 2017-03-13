@@ -3,6 +3,7 @@
   "id": "1",
   "attributes": {
     "title": "Rails was Omakase",
+    "heading_a": null,
     "likes": 500,
     "published": false,
     "draft": true,
