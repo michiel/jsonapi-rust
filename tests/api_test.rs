@@ -465,3 +465,32 @@ fn can_get_attribute() {
         }
     }
 }
+
+#[test]
+fn can_diff_resource() {
+    let s1 = ::read_json_file("data/resource_post_001.json");
+    let s2 = ::read_json_file("data/resource_post_002.json");
+
+    let data1: Result<Resource, serde_json::Error> = serde_json::from_str(&s1);
+    let data2: Result<Resource, serde_json::Error> = serde_json::from_str(&s2);
+
+    match data1 {
+        Err(_) => assert!(false),
+        Ok(res1) => {
+            // So far so good
+            match data2 {
+                Err(_) => assert!(false),
+                Ok(res2) => {
+                    match res1.diff(res2) {
+                        Err(_) => {
+                            assert!(false);
+                        }
+                        Ok(patchset) => {
+                            assert_eq!(patchset.patches.len(), 5);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

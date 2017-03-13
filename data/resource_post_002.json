@@ -1,0 +1,25 @@
+{
+  "type": "posts",
+  "id": "1",
+  "attributes": {
+    "title": "Rails was Omakase",
+    "heading_a": null,
+    "likes": 500,
+    "published": false,
+    "draft": true,
+    "tags": ["random", "unpublished"]
+  },
+  "relationships": {
+    "author": {
+      "links": {
+        "self": "/posts/10/relationships/author",
+        "related": "/posts/1/author"
+      },
+      "data": { "type": "people", "id": "10" }
+    }
+  },
+  "links": {
+    "self": "http://example.com/posts/1"
+  }
+}
+
