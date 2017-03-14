@@ -266,7 +266,7 @@ impl JsonApiDocument {
     /// assert_eq!(doc.is_ok(), true);
     /// ```
     pub fn from_str(s: &str) -> Result<Self, serde_json::Error> {
-        serde_json::from_str(&s)
+        serde_json::from_str(s)
     }
 }
 
@@ -341,7 +341,7 @@ impl Resource {
     pub fn get_attribute(&self, name: &str) -> Option<&JsonApiValue> {
         match self.attributes.get(name) {
             None => None,
-            Some(val) => Some(&val),
+            Some(val) => Some(val),
         }
     }
 

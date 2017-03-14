@@ -97,7 +97,7 @@ impl Query {
                 };
 
                 Query {
-                    _type: format!("none"),
+                    _type: "none".into(),
                     include: include,
                     fields: Some(fields),
                     page: Some(page),
@@ -106,7 +106,7 @@ impl Query {
             Err(err) => {
                 println!("Query: Can't parse : {:?}", err);
                 Query {
-                    _type: format!("none"),
+                    _type: "none".into(),
                     include: None,
                     fields: None,
                     page: None,
@@ -121,7 +121,7 @@ impl Query {
     /// ```
     /// use jsonapi::query::{Query, PageParams};
     /// let query = Query {
-    ///   _type: format!("none"),
+    ///   _type: "post".into(),
     ///   include: Some(vec!["author".into()]),
     ///   fields: None,
     ///   page: Some(PageParams {
@@ -148,7 +148,7 @@ impl Query {
 
         match self.fields {
             Some(ref fields) => {
-                for (name, ref val) in fields.iter() {
+                for (name, val) in fields.iter() {
                     params.push(format!("fields[{}]={}", name, val.join(",")));
                 }
             }
