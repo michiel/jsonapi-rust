@@ -45,7 +45,7 @@ impl Query {
                             None => None,
                             Some(include_str) => {
                                 let arr: Vec<String> =
-                                    include_str.split(",").map(|s| s.to_string()).collect();
+                                    include_str.split(',').map(|s| s.to_string()).collect();
                                 Some(arr)
                             }
                         }
@@ -57,7 +57,7 @@ impl Query {
                 o.find("fields").map(|x| if x.is_object() {
                     x.as_object().map(|obj| for (key, value) in obj.iter() {
                         let arr: Vec<String> = match value.as_str() {
-                            Some(string) => string.split(",").map(|s| s.to_string()).collect(),
+                            Some(string) => string.split(',').map(|s| s.to_string()).collect(),
                             None => Vec::<String>::new(),
                         };
                         fields.insert(key.to_string(), arr);

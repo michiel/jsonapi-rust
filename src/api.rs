@@ -291,7 +291,7 @@ impl Resource {
     /// assert_eq!(data.is_ok(), true);
     /// ```
     pub fn from_str(s: &str) -> Result<Self, serde_json::Error> {
-        serde_json::from_str(&s)
+        serde_json::from_str(s)
     }
 
     pub fn get_relationship(&self, name: &str) -> Option<&Relationship> {
@@ -417,7 +417,7 @@ impl Resource {
 
     pub fn patch(&mut self, patchset: PatchSet) -> Result<Resource, DiffPatchError> {
         let mut res = self.clone();
-        for patch in patchset.patches.iter() {
+        for patch in &patchset.patches {
             res.attributes.insert(patch.subject.clone(), patch.next.clone());
         }
         Ok(res)
