@@ -40,3 +40,13 @@ To run clippy, find a last known working version of nightly that runs with clipp
     rustup run nightly-2017-03-01 cargo install clippy
     rustup run nightly-2017-03-01 cargo clippy
 
+### Dependency scanning
+
+Check for outdated packages
+
+    cargo outdated
+
+Check packages for known vulnerabilities
+
+    cargo audit ; echo $?
+
