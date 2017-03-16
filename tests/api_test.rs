@@ -369,47 +369,6 @@ fn can_deserialize_jsonapi_example_jsonapi_info() {
 }
 
 #[test]
-fn can_get_string_attribute() {
-    let s = ::read_json_file("data/resource_all_attributes.json");
-    let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
-    match data {
-        Err(_) => assert!(false),
-        Ok(res) => {
-            match res.get_attribute_as_string("title") {
-                Err(_) => assert!(false),
-                Ok(s) => assert_eq!(s, "Rails is Omakase"),
-            }
-            match res.get_attribute_as_string("likes") {
-                Err(err) => assert_eq!(err, JsonApiDataError::IncompatibleAttributeType),
-                Ok(_) => assert!(false),
-            }
-        }
-    }
-}
-
-#[test]
-fn can_get_number_attribute() {
-    let s = ::read_json_file("data/resource_all_attributes.json");
-    let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
-    match data {
-        Err(_) => assert!(false),
-        Ok(res) => {
-            match res.get_attribute_as_i64("likes") {
-                Err(_) => assert!(false),
-                Ok(s) => {
-                    let x: i64 = 250;
-                    assert_eq!(s, x);
-                }
-            }
-            match res.get_attribute_as_i64("title") {
-                Err(err) => assert_eq!(err, JsonApiDataError::IncompatibleAttributeType),
-                Ok(_) => assert!(false),
-            }
-        }
-    }
-}
-
-#[test]
 fn can_get_attribute() {
     let s = ::read_json_file("data/resource_all_attributes.json");
     let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);

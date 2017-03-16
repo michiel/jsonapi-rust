@@ -346,30 +346,6 @@ impl Resource {
         }
     }
 
-    pub fn get_attribute_as_string(&self, attr: &str) -> Result<String, JsonApiDataError> {
-        match self.attributes.get(attr) {
-            None => Err(JsonApiDataError::AttributeNotFound),
-            Some(json_attr) => {
-                match json_attr.as_str() {
-                    None => Err(JsonApiDataError::IncompatibleAttributeType),
-                    Some(s) => Ok(s.into()),
-                }
-            }
-        }
-    }
-
-    pub fn get_attribute_as_i64(&self, attr: &str) -> Result<i64, JsonApiDataError> {
-        match self.attributes.get(attr) {
-            None => Err(JsonApiDataError::AttributeNotFound),
-            Some(json_attr) => {
-                match json_attr.as_i64() {
-                    None => Err(JsonApiDataError::IncompatibleAttributeType),
-                    Some(s) => Ok(s.into()),
-                }
-            }
-        }
-    }
-
     pub fn diff(&self, other: Resource) -> Result<PatchSet, DiffPatchError> {
         if self._type != other._type {
             Err(DiffPatchError::IncompatibleTypes(self._type.clone(), other._type.clone()))
