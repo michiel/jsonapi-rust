@@ -40,6 +40,7 @@ pub struct Resource {
     pub attributes: ResourceAttributes,
     pub relationships: Option<Relationships>,
     pub links: Option<Links>,
+    pub meta: Option<Meta>,
 }
 
 /// Relationship with another object
@@ -342,30 +343,6 @@ impl Resource {
         match self.attributes.get(name) {
             None => None,
             Some(val) => Some(val),
-        }
-    }
-
-    pub fn get_attribute_as_string(&self, attr: &str) -> Result<String, JsonApiDataError> {
-        match self.attributes.get(attr) {
-            None => Err(JsonApiDataError::AttributeNotFound),
-            Some(json_attr) => {
-                match json_attr.as_str() {
-                    None => Err(JsonApiDataError::IncompatibleAttributeType),
-                    Some(s) => Ok(s.into()),
-                }
-            }
-        }
-    }
-
-    pub fn get_attribute_as_i64(&self, attr: &str) -> Result<i64, JsonApiDataError> {
-        match self.attributes.get(attr) {
-            None => Err(JsonApiDataError::AttributeNotFound),
-            Some(json_attr) => {
-                match json_attr.as_i64() {
-                    None => Err(JsonApiDataError::IncompatibleAttributeType),
-                    Some(s) => Ok(s.into()),
-                }
-            }
         }
     }
 
