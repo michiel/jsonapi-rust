@@ -40,6 +40,7 @@ pub struct Resource {
     pub attributes: ResourceAttributes,
     pub relationships: Option<Relationships>,
     pub links: Option<Links>,
+    pub meta: Option<Meta>,
 }
 
 /// Relationship with another object

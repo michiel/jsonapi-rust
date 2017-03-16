@@ -14,6 +14,7 @@ fn it_works() {
         attributes: ResourceAttributes::new(),
         relationships: Some(Relationships::new()),
         links: None,
+        meta: Some(Meta::new()),
     };
 
     assert_eq!(resource.id, "123");
@@ -44,6 +45,7 @@ fn jsonapi_document_can_be_valid() {
         attributes: ResourceAttributes::new(),
         relationships: Some(Relationships::new()),
         links: None,
+        meta: Some(Meta::new()),
     };
 
     let errors = JsonApiErrors::new();
@@ -80,6 +82,7 @@ fn jsonapi_document_invalid_errors() {
         attributes: ResourceAttributes::new(),
         relationships: Some(Relationships::new()),
         links: None,
+        meta: Some(Meta::new()),
     };
 
     let included_resource = Resource {
@@ -88,6 +91,7 @@ fn jsonapi_document_invalid_errors() {
         attributes: ResourceAttributes::new(),
         relationships: Some(Relationships::new()),
         links: None,
+        meta: Some(Meta::new()),
     };
 
     let errors = JsonApiErrors::new();
