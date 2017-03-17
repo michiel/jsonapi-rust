@@ -137,29 +137,22 @@ impl Query {
     pub fn to_params(&self) -> String {
         let mut params = Vec::<String>::new();
 
-        match self.include {
-            Some(ref include) => params.push(format!("include={}", include.join(","))),
-            None => (),
+        if let Some(ref include) = self.include {
+            params.push(format!("include={}", include.join(",")));
         }
 
         // Examples from json-api.org,
         // fields[articles]=title,body,author&fields[people]=name
         // fields[articles]=title,body&fields[people]=name
 
-        match self.fields {
-            Some(ref fields) => {
-                for (name, val) in fields.iter() {
-                    params.push(format!("fields[{}]={}", name, val.join(",")));
-                }
+        if let Some(ref fields) = self.fields {
+            for (name, val) in fields.iter() {
+                params.push(format!("fields[{}]={}", name, val.join(",")));
             }
-            None => (),
         }
 
-        match self.page {
-            Some(ref page) => {
-                params.push(page.to_params());
-            }
-            None => (),
+        if let Some(ref page) = self.page {
+            params.push(page.to_params());
         }
 
         params.join("&")

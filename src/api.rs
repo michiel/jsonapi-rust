@@ -368,7 +368,7 @@ impl Resource {
             } else {
                 let mut patchset = PatchSet::new_for(self);
 
-                for (attr, self_value) in self.attributes.iter() {
+                for (attr, self_value) in &self.attributes {
                     match other.attributes.get(attr) {
                         None => {
                             // XXX This should not happen
