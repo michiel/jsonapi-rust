@@ -259,6 +259,7 @@ impl FromStr for JsonApiDocument {
     ///
     /// ```
     /// use jsonapi::api::JsonApiDocument;
+    /// use std::str::FromStr;
     ///
     /// let serialized = r#"{
     ///   "data" : [
@@ -292,6 +293,7 @@ impl Resource {
     ///
     /// ```
     /// use jsonapi::api::Resource;
+    /// use std::str::FromStr;
     ///
     /// let serialized = r#"{
     ///   "id":"1",
@@ -388,6 +390,7 @@ impl FromStr for Resource {
     ///
     /// ```
     /// use jsonapi::api::Resource;
+    /// use std::str::FromStr;
     ///
     /// let serialized = r#"{
     ///   "id":"1",
