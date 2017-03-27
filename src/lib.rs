@@ -21,6 +21,9 @@ extern crate serde_derive;
 
 extern crate queryst;
 
+#[macro_use]
+extern crate log;
+
 pub mod api;
 pub mod query;
 pub mod model;
