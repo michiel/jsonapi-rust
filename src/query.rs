@@ -64,7 +64,7 @@ impl Query {
 
                     });
                 } else {
-                    println!("No fields found in {:?}", x);
+                    error!("Query::from_params : No fields found in {:?}", x);
                 });
 
                 let page = PageParams {
@@ -104,7 +104,7 @@ impl Query {
                 }
             }
             Err(err) => {
-                println!("Query: Can't parse : {:?}", err);
+                error!("Query::from_params : Can't parse : {:?}", err);
                 Query {
                     _type: "none".into(),
                     include: None,

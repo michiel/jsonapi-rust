@@ -371,7 +371,9 @@ impl Resource {
                 for (attr, self_value) in &self.attributes {
                     match other.attributes.get(attr) {
                         None => {
-                            // XXX This should not happen
+                            error!("Resource::diff unable to find attribute {:?} in {:?}",
+                                   attr,
+                                   other);
                         }
                         Some(other_value) => {
                             if self_value.to_string() != other_value.to_string() {
