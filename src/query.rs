@@ -1,7 +1,7 @@
 use queryst::parse;
 use std::collections::HashMap;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct PageParams {
     pub size: i64,
     pub number: i64,

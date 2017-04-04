@@ -420,20 +420,20 @@ impl Relationship {
 }
 
 /// Top-level (Document) JSON-API specification violations
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub enum DocumentValidationError {
     IncludedWithoutData,
     DataWithErrors,
     MissingContent,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub enum JsonApiDataError {
     AttributeNotFound,
     IncompatibleAttributeType,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub enum RelationshipAssumptionError {
     RelationshipIsAList,
     RelationshipIsNotAList,
@@ -447,7 +447,7 @@ pub enum DiffPatchError {
     IncorrectPropertyValue(String),
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub enum PatchType {
     Relationship,
     Attribute,
