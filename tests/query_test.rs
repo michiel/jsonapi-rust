@@ -53,6 +53,75 @@ fn can_parse() {
 }
 
 #[test]
+fn can_parse_and_provide_defaults_for_missing_values() {
+    let _ = env_logger::init();
+    let query = Query::from_params("");
+
+    match query.include {
+        None => assert!(true),
+        Some(_) => assert!(false),
+    }
+
+    match query.fields {
+        None => assert!(false),
+        Some(_) => assert!(true),
+    }
+
+    match query.page {
+        None => assert!(false),
+        Some(page) => {
+            assert_eq!(page.size, 0);
+            assert_eq!(page.number, 0);
+        }
+    }
+}
+
+#[test]
+fn can_parse_and_use_defaults_for_invalid_values() {
+    let _ = env_logger::init();
+    let query = Query::from_params("page[number]=x&page[size]=y");
+
+    match query.include {
+        None => assert!(true),
+        Some(_) => assert!(false),
+    }
+
+    match query.fields {
+        None => assert!(false),
+        Some(_) => assert!(true),
+    }
+
+    match query.page {
+        None => assert!(false),
+        Some(page) => {
+            assert_eq!(page.size, 0);
+            assert_eq!(page.number, 0);
+        }
+    }
+}
+
+#[test]
+fn can_provide_and_empty_struct() {
+    let _ = env_logger::init();
+    let query = Query::from_params("!");
+
+    match query.include {
+        None => assert!(true),
+        Some(_) => assert!(false),
+    }
+
+    match query.fields {
+        None => assert!(false),
+        Some(_) => assert!(true),
+    }
+
+    match query.page {
+        None => assert!(false),
+        Some(_) => assert!(true),
+    }
+}
+
+#[test]
 fn can_generate_string_empty() {
     let _ = env_logger::init();
     let query = Query {
