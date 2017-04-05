@@ -69,27 +69,53 @@ impl Query {
 
                 let page = PageParams {
                     number: match o.find_path(&["page", "number"]) {
-                        None => 0,
+                        None => {
+                            warn!("Query::from_params : No page/number found in {:?}, setting \
+                                   default 0",
+                                  o);
+                            0
+                        }
                         Some(num) => {
                             if num.is_string() {
                                 match num.as_str().map(str::parse::<i64>) {
                                     Some(y) => y.unwrap_or(0),
-                                    None => 0,
+                                    None => {
+                                        warn!("Query::from_params : page/number found in {:?}, \
+                                               not able not able to parse it - setting default 0",
+                                              o);
+                                        0
+                                    }
                                 }
                             } else {
+                                warn!("Query::from_params : page/number found in {:?}, but it is \
+                                       not an expected type - setting default 0",
+                                      o);
                                 0
                             }
                         }
                     },
                     size: match o.find_path(&["page", "size"]) {
-                        None => 0,
+                        None => {
+                            warn!("Query::from_params : No page/size found in {:?}, setting \
+                                   default 0",
+                                  o);
+                            0
+                        }
                         Some(num) => {
                             if num.is_string() {
                                 match num.as_str().map(str::parse::<i64>) {
                                     Some(y) => y.unwrap_or(0),
-                                    None => 0,
+                                    None => {
+                                        warn!("Query::from_params : page/size found in {:?}, \
+                                               not able not able to parse it - setting default 0",
+                                              o);
+                                        0
+                                    }
                                 }
                             } else {
+                                warn!("Query::from_params : page/size found in {:?}, but it is \
+                                       not an expected type - setting default 0",
+                                      o);
                                 0
                             }
                         }
