@@ -470,6 +470,7 @@ fn can_diff_resource() {
                             assert!(false);
                         }
                         Ok(patchset) => {
+                            println!("can_diff_resource: PatchSet is {:?}", patchset);
                             assert_eq!(patchset.patches.len(), 5);
                         }
                     }
