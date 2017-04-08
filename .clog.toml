@@ -3,7 +3,7 @@ repository = "https://github.com/michiel/jsonapi-rust"
 link-style = "github"
 changelog = "CHANGELOG.md"
 output-format = "markdown"
-# from-latest-tag = true
+from-latest-tag = true
 
 [sections]
 Features = ["feat", "feature"]
