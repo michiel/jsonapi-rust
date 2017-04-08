@@ -55,7 +55,7 @@ pub struct Relationship {
 #[serde(untagged)]
 pub enum PrimaryData {
     None,
-    Single(Resource),
+    Single(Box<Resource>),
     Multiple(Resources),
 }
 

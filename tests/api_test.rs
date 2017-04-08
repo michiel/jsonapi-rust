@@ -54,7 +54,7 @@ fn jsonapi_document_can_be_valid() {
     let errors = JsonApiErrors::new();
 
     let jsonapi_document_with_data = JsonApiDocument {
-        data: Some(PrimaryData::Single(resource)),
+        data: Some(PrimaryData::Single(Box::new(resource))),
         errors: None,
         meta: None,
         included: None,
@@ -131,7 +131,7 @@ fn jsonapi_document_invalid_errors() {
     }
 
     let mixed_errors_and_data_document = JsonApiDocument {
-        data: Some(PrimaryData::Single(resource)),
+        data: Some(PrimaryData::Single(Box::new(resource))),
         errors: Some(errors),
         meta: None,
         included: None,
