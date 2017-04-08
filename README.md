@@ -51,3 +51,8 @@ Check packages for known vulnerabilities
 
     cargo audit ; echo $?
 
+### Changes and changelog generation
+
+Commit messages are written using [conventional](https://github.com/conventional-changelog/conventional-changelog/blob/a5505865ff3dd710cf757f50530e73ef0ca641da/conventions/angular.md) format. The Changelog is updated using the [clog](https://github.com/clog-tool/clog-cli) tool. The configuration is found in `.clog.toml`.
+
+
