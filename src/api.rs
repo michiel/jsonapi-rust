@@ -146,21 +146,6 @@ impl PatchSet {
     }
 }
 
-impl Pagination {
-    pub fn has_first(&self) -> bool {
-        !self.first.is_none()
-    }
-    pub fn has_prev(&self) -> bool {
-        !self.prev.is_none()
-    }
-    pub fn has_next(&self) -> bool {
-        !self.next.is_none()
-    }
-    pub fn has_last(&self) -> bool {
-        !self.last.is_none()
-    }
-}
-
 /// Top-level JSON-API Document
 impl JsonApiDocument {
     fn has_errors(&self) -> bool {
