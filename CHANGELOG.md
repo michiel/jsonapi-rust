@@ -1,4 +1,12 @@
 <a name=""></a>
+##  0.5.1 (2017-04-13)
+
+#### Bugfixes
+
+*   Not to include data and errors in a same document ([71e65a8](https://github.com/michiel/jsonapi-rust/commit/71e65a8822235e359029c32af51a23bc911fb37d))
+
+
+<a name=""></a>
 ## 0.5.0  (2017-04-08)
 
 
