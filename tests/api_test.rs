@@ -40,6 +40,40 @@ fn it_works() {
 }
 
 #[test]
+fn the_members_data_and_errors_must_not_coexist() {
+    use serde_json::Value;
+
+    let jsonapidocument = JsonApiDocument {
+        data: Some(PrimaryData::None),
+        errors: None,
+        meta: None,
+        included: None,
+        links: None,
+        jsonapi: None,
+    };
+
+    let string = serde_json::to_string(&jsonapidocument).unwrap();
+    let json: Value = serde_json::from_str(&string).unwrap();
+    assert_eq!(json.get("data").unwrap().is_null(), true);
+    assert_eq!(json.get("errors"), None);
+
+    let errors = JsonApiErrors::new();
+    let jsonapi_document_with_errors = JsonApiDocument {
+        data: None,
+        errors: Some(errors),
+        meta: None,
+        included: None,
+        links: None,
+        jsonapi: None,
+    };
+
+    let string = serde_json::to_string(&jsonapi_document_with_errors).unwrap();
+    let json: Value = serde_json::from_str(&string).unwrap();
+    assert_eq!(json.get("data"), None);
+    assert_eq!(json.get("errors").unwrap().is_array(), true);
+}
+
+#[test]
 fn jsonapi_document_can_be_valid() {
     let _ = env_logger::init();
     let resource = Resource {

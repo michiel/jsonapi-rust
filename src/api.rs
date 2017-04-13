@@ -71,10 +71,12 @@ pub enum IdentifierData {
 /// The specification refers to this as a top-level `document`
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct JsonApiDocument {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<PrimaryData>,
     pub included: Option<Resources>,
     pub links: Option<Links>,
     pub meta: Option<Meta>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub errors: Option<JsonApiErrors>,
     pub jsonapi: Option<JsonApiInfo>,
 }
