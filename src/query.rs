@@ -8,7 +8,7 @@ pub struct PageParams {
 }
 
 /// JSON-API Query parameters
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Default)]
 pub struct Query {
     pub _type: String,
     pub include: Option<Vec<String>>,
@@ -133,9 +133,7 @@ impl Query {
                 error!("Query::from_params : Can't parse : {:?}", err);
                 Query {
                     _type: "none".into(),
-                    include: None,
-                    fields: None,
-                    page: None,
+                    ..Default::default()
                 }
             }
         }

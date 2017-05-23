@@ -32,14 +32,17 @@ pub struct ResourceIdentifier {
 }
 
 /// JSON-API Resource
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct Resource {
     #[serde(rename = "type")]
     pub _type: String,
     pub id: JsonApiId,
     pub attributes: ResourceAttributes,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub relationships: Option<Relationships>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub links: Option<Links>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub meta: Option<Meta>,
 }
 
@@ -47,6 +50,7 @@ pub struct Resource {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Relationship {
     pub data: IdentifierData,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub links: Option<Links>,
 }
 
@@ -69,20 +73,24 @@ pub enum IdentifierData {
 }
 
 /// The specification refers to this as a top-level `document`
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct JsonApiDocument {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<PrimaryData>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub included: Option<Resources>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub links: Option<Links>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub meta: Option<Meta>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub errors: Option<JsonApiErrors>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub jsonapi: Option<JsonApiInfo>,
 }
 
 /// Error location
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct ErrorSource {
     pub pointer: Option<String>,
     pub parameter: Option<String>,
@@ -90,15 +98,23 @@ pub struct ErrorSource {
 
 /// JSON-API Error
 /// All fields are optional
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct JsonApiError {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub links: Option<Links>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub code: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub title: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub detail: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<ErrorSource>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub meta: Option<Meta>,
 }
 
@@ -174,10 +190,7 @@ impl JsonApiDocument {
     /// let doc = JsonApiDocument {
     ///     data: Some(PrimaryData::None),
     ///     errors: Some(JsonApiErrors::new()),
-    ///     meta: None,
-    ///     included: None,
-    ///     links: None,
-    ///     jsonapi: None,
+    ///     ..Default::default()
     /// };
     ///
     /// assert_eq!(doc.is_valid(), false);
@@ -198,10 +211,7 @@ impl JsonApiDocument {
     /// let doc = JsonApiDocument {
     ///     data: Some(PrimaryData::None),
     ///     errors: Some(JsonApiErrors::new()),
-    ///     meta: None,
-    ///     included: None,
-    ///     links: None,
-    ///     jsonapi: None,
+    ///     ..Default::default()
     /// };
     ///
     /// match doc.validate() {
