@@ -1,4 +1,15 @@
 <a name=""></a>
+##  0.5.2 (2017-05-29)
+
+
+#### Features
+
+*   Use and serialize sparse structs (#27) ([75b6bacf](https://github.com/michiel/jsonapi-rust/commit/75b6bacf8cff34d03dcfa19e1fc5d743578be2dc))
+*   Box the PrimaryData::Single variant (#26) ([e2c9dd5a](https://github.com/michiel/jsonapi-rust/commit/e2c9dd5a6663ef59a15c63d0b45cbef629953651))
+
+
+
+<a name=""></a>
 ##  0.5.1 (2017-04-13)
 
 #### Bugfixes
