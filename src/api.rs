@@ -1,5 +1,6 @@
 use serde_json;
 use std::collections::HashMap;
+use std::str::FromStr;
 
 /// Permitted JSON-API values (all JSON Values)
 pub type JsonApiValue = serde_json::Value;
@@ -247,11 +248,15 @@ impl JsonApiDocument {
         }
 
     }
+}
 
+impl FromStr for JsonApiDocument {
+    type Err = serde_json::Error;
     /// Instantiate from string
     ///
     /// ```
     /// use jsonapi::api::JsonApiDocument;
+    /// use std::str::FromStr;
     ///
     /// let serialized = r#"{
     ///   "data" : [
@@ -263,35 +268,12 @@ impl JsonApiDocument {
     /// let doc = JsonApiDocument::from_str(&serialized);
     /// assert_eq!(doc.is_ok(), true);
     /// ```
-    pub fn from_str(s: &str) -> Result<Self, serde_json::Error> {
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         serde_json::from_str(s)
     }
 }
 
 impl Resource {
-    /// Instantiate from string
-    ///
-    /// ```
-    /// use jsonapi::api::Resource;
-    ///
-    /// let serialized = r#"{
-    ///   "id":"1",
-    ///   "type":"post",
-    ///   "attributes":{
-    ///     "title": "Rails is Omakase",
-    ///     "likes": 250
-    ///   },
-    ///   "relationships":{},
-    ///   "links" :{}
-    /// }"#;
-    ///
-    /// let data = Resource::from_str(&serialized);
-    /// assert_eq!(data.is_ok(), true);
-    /// ```
-    pub fn from_str(s: &str) -> Result<Self, serde_json::Error> {
-        serde_json::from_str(s)
-    }
-
     pub fn get_relationship(&self, name: &str) -> Option<&Relationship> {
         match self.relationships {
             None => None,
@@ -308,6 +290,7 @@ impl Resource {
     ///
     /// ```
     /// use jsonapi::api::Resource;
+    /// use std::str::FromStr;
     ///
     /// let serialized = r#"{
     ///   "id":"1",
@@ -397,6 +380,33 @@ impl Resource {
             res.attributes.insert(patch.subject.clone(), patch.next.clone());
         }
         Ok(res)
+    }
+}
+
+impl FromStr for Resource {
+    type Err = serde_json::Error;
+    /// Instantiate from string
+    ///
+    /// ```
+    /// use jsonapi::api::Resource;
+    /// use std::str::FromStr;
+    ///
+    /// let serialized = r#"{
+    ///   "id":"1",
+    ///   "type":"post",
+    ///   "attributes":{
+    ///     "title": "Rails is Omakase",
+    ///     "likes": 250
+    ///   },
+    ///   "relationships":{},
+    ///   "links" :{}
+    /// }"#;
+    ///
+    /// let data = Resource::from_str(&serialized);
+    /// assert_eq!(data.is_ok(), true);
+    /// ```
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        serde_json::from_str(s)
     }
 }
 
