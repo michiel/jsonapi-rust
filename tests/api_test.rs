@@ -28,11 +28,7 @@ fn it_works() {
 
     let jsonapidocument = JsonApiDocument {
         data: Some(PrimaryData::None),
-        errors: None,
-        meta: None,
-        included: None,
-        links: None,
-        jsonapi: None,
+        ..Default::default()
     };
 
     assert_eq!(jsonapidocument.is_valid(), true);
@@ -45,11 +41,7 @@ fn the_members_data_and_errors_must_not_coexist() {
 
     let jsonapidocument = JsonApiDocument {
         data: Some(PrimaryData::None),
-        errors: None,
-        meta: None,
-        included: None,
-        links: None,
-        jsonapi: None,
+        ..Default::default()
     };
 
     let string = serde_json::to_string(&jsonapidocument).unwrap();
@@ -59,12 +51,8 @@ fn the_members_data_and_errors_must_not_coexist() {
 
     let errors = JsonApiErrors::new();
     let jsonapi_document_with_errors = JsonApiDocument {
-        data: None,
         errors: Some(errors),
-        meta: None,
-        included: None,
-        links: None,
-        jsonapi: None,
+        ..Default::default()
     };
 
     let string = serde_json::to_string(&jsonapi_document_with_errors).unwrap();
@@ -89,11 +77,7 @@ fn jsonapi_document_can_be_valid() {
 
     let jsonapi_document_with_data = JsonApiDocument {
         data: Some(PrimaryData::Single(Box::new(resource))),
-        errors: None,
-        meta: None,
-        included: None,
-        links: None,
-        jsonapi: None,
+        ..Default::default()
     };
 
     assert_eq!(jsonapi_document_with_data.is_valid(), true);
@@ -101,10 +85,7 @@ fn jsonapi_document_can_be_valid() {
     let jsonapi_document_with_errors = JsonApiDocument {
         data: Some(PrimaryData::None),
         errors: Some(errors),
-        meta: None,
-        included: None,
-        links: None,
-        jsonapi: None,
+        ..Default::default()
     };
 
     assert_eq!(jsonapi_document_with_errors.is_valid(), false);
@@ -134,14 +115,7 @@ fn jsonapi_document_invalid_errors() {
 
     let errors = JsonApiErrors::new();
 
-    let no_content_document = JsonApiDocument {
-        data: None,
-        errors: None,
-        meta: None,
-        included: None,
-        links: None,
-        jsonapi: None,
-    };
+    let no_content_document : JsonApiDocument = Default::default();
 
     match no_content_document.validate() {
         None => assert!(false),
@@ -152,11 +126,7 @@ fn jsonapi_document_invalid_errors() {
 
     let null_data_content_document = JsonApiDocument {
         data: Some(PrimaryData::None),
-        errors: None,
-        meta: None,
-        included: None,
-        links: None,
-        jsonapi: None,
+        ..Default::default()
     };
 
     match null_data_content_document.validate() {
@@ -167,10 +137,7 @@ fn jsonapi_document_invalid_errors() {
     let mixed_errors_and_data_document = JsonApiDocument {
         data: Some(PrimaryData::Single(Box::new(resource))),
         errors: Some(errors),
-        meta: None,
-        included: None,
-        links: None,
-        jsonapi: None,
+        ..Default::default()
     };
 
     match mixed_errors_and_data_document.validate() {
@@ -181,12 +148,8 @@ fn jsonapi_document_invalid_errors() {
     }
 
     let included_without_data_document = JsonApiDocument {
-        data: None,
-        errors: None,
-        meta: None,
         included: Some(vec![included_resource]),
-        links: None,
-        jsonapi: None,
+        ..Default::default()
     };
 
     match included_without_data_document.validate() {
@@ -512,4 +475,46 @@ fn can_diff_resource() {
             }
         }
     }
+}
+
+#[test]
+fn it_omits_empty_document_and_primary_data_keys() {
+    let _ = env_logger::init();
+    let resource = Resource {
+        _type: "test".into(),
+        id: "123".into(),
+        attributes: ResourceAttributes::new(),
+        ..Default::default()
+    };
+    let doc = JsonApiDocument {
+        data: Some(PrimaryData::Single(Box::new(resource))),
+        ..Default::default()
+    };
+
+    assert_eq!(serde_json::to_string(&doc).unwrap(),
+        r#"{"data":{"type":"test","id":"123","attributes":{}}}"#);
+}
+
+#[test]
+fn it_does_not_omit_an_empty_primary_data() {
+    let doc = JsonApiDocument {
+        data: Some(PrimaryData::None),
+        ..Default::default()
+    };
+
+    assert_eq!(serde_json::to_string(&doc).unwrap(), r#"{"data":null}"#);
+}
+
+#[test]
+fn it_omits_empty_error_keys() {
+    let error = JsonApiError{
+        id: Some("error_id".to_string()),
+        ..Default::default()
+    };
+    let doc = JsonApiDocument {
+        errors: Some(vec![error]),
+        ..Default::default()
+    };
+    assert_eq!(serde_json::to_string(&doc).unwrap(),
+        r#"{"errors":[{"id":"error_id"}]}"#);
 }
