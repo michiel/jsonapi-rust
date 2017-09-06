@@ -16,14 +16,15 @@
 
 extern crate serde;
 extern crate serde_json;
-#[macro_use]
-extern crate serde_derive;
+#[macro_use] extern crate serde_derive;
 
 extern crate queryst;
 
-#[macro_use]
-extern crate log;
+#[macro_use] extern crate log;
+
+#[macro_use] extern crate error_chain;
 
 pub mod api;
 pub mod query;
 pub mod model;
+pub mod errors;

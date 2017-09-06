@@ -1,5 +1,4 @@
 extern crate jsonapi;
-extern crate serde_json;
 extern crate env_logger;
 
 use jsonapi::query::*;
