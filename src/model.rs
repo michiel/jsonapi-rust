@@ -218,10 +218,12 @@ macro_rules! jsonapi_model {
             fn jsonapi_id(&self) -> String { self.id.to_string() }
 
             fn relationship_fields() -> Option<&'static [&'static str]> {
-                Some(&[
+                static FIELDS: &'static [&'static str] = &[
                      $( stringify!($has_one),)*
                      $( stringify!($has_many),)*
-                ])
+                ];
+
+                Some(FIELDS)
             }
             
             fn build_relationships(&self) -> Option<Relationships> {
@@ -252,3 +254,18 @@ macro_rules! jsonapi_model {
         }
     );
 }
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct Dog {
+    id: String,
+    name: String,
+    age: i32,
+    main_flea: Flea,
+    fleas: Vec<Flea>,
+}
+jsonapi_model!(Dog; "dog"; has one main_flea; has many fleas);
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct Flea {
+    id: String,
+    name: String,
+}
+jsonapi_model!(Flea; "flea");
