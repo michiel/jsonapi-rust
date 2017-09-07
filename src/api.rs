@@ -1,5 +1,8 @@
 use serde_json;
 use std::collections::HashMap;
+use errors::*;
+use std::str::FromStr;
+use std;
 
 /// Permitted JSON-API values (all JSON Values)
 pub type JsonApiValue = serde_json::Value;
@@ -247,11 +250,16 @@ impl JsonApiDocument {
         }
 
     }
+}
+
+impl FromStr for JsonApiDocument {
+    type Err = Error;
 
     /// Instantiate from string
     ///
     /// ```
     /// use jsonapi::api::JsonApiDocument;
+    /// use std::str::FromStr;
     ///
     /// let serialized = r#"{
     ///   "data" : [
@@ -263,35 +271,12 @@ impl JsonApiDocument {
     /// let doc = JsonApiDocument::from_str(&serialized);
     /// assert_eq!(doc.is_ok(), true);
     /// ```
-    pub fn from_str(s: &str) -> Result<Self, serde_json::Error> {
-        serde_json::from_str(s)
+    fn from_str(s: &str) -> Result<Self> {
+        serde_json::from_str(s).chain_err(|| "Error parsing Document")
     }
 }
 
 impl Resource {
-    /// Instantiate from string
-    ///
-    /// ```
-    /// use jsonapi::api::Resource;
-    ///
-    /// let serialized = r#"{
-    ///   "id":"1",
-    ///   "type":"post",
-    ///   "attributes":{
-    ///     "title": "Rails is Omakase",
-    ///     "likes": 250
-    ///   },
-    ///   "relationships":{},
-    ///   "links" :{}
-    /// }"#;
-    ///
-    /// let data = Resource::from_str(&serialized);
-    /// assert_eq!(data.is_ok(), true);
-    /// ```
-    pub fn from_str(s: &str) -> Result<Self, serde_json::Error> {
-        serde_json::from_str(s)
-    }
-
     pub fn get_relationship(&self, name: &str) -> Option<&Relationship> {
         match self.relationships {
             None => None,
@@ -308,6 +293,7 @@ impl Resource {
     ///
     /// ```
     /// use jsonapi::api::Resource;
+    /// use std::str::FromStr;
     ///
     /// let serialized = r#"{
     ///   "id":"1",
@@ -343,7 +329,7 @@ impl Resource {
         }
     }
 
-    pub fn diff(&self, other: Resource) -> Result<PatchSet, DiffPatchError> {
+    pub fn diff(&self, other: Resource) -> std::result::Result<PatchSet, DiffPatchError> {
         if self._type != other._type {
             Err(DiffPatchError::IncompatibleTypes(self._type.clone(), other._type.clone()))
         } else {
@@ -391,7 +377,7 @@ impl Resource {
         }
     }
 
-    pub fn patch(&mut self, patchset: PatchSet) -> Result<Resource, DiffPatchError> {
+    pub fn patch(&mut self, patchset: PatchSet) -> Result<Resource> {
         let mut res = self.clone();
         for patch in &patchset.patches {
             res.attributes.insert(patch.subject.clone(), patch.next.clone());
@@ -400,8 +386,37 @@ impl Resource {
     }
 }
 
+impl FromStr for Resource {
+    type Err = Error;
+
+    /// Instantiate from string
+    ///
+    /// ```
+    /// use jsonapi::api::Resource;
+    /// use std::str::FromStr;
+    ///
+    /// let serialized = r#"{
+    ///   "id":"1",
+    ///   "type":"post",
+    ///   "attributes":{
+    ///     "title": "Rails is Omakase",
+    ///     "likes": 250
+    ///   },
+    ///   "relationships":{},
+    ///   "links" :{}
+    /// }"#;
+    ///
+    /// let data = Resource::from_str(&serialized);
+    /// assert_eq!(data.is_ok(), true);
+    /// ```
+    fn from_str(s: &str) -> Result<Self> {
+        serde_json::from_str(s).chain_err(|| "Error parsing resource" )
+    }
+}
+
+
 impl Relationship {
-    pub fn as_id(&self) -> Result<Option<&JsonApiId>, RelationshipAssumptionError> {
+    pub fn as_id(&self) -> std::result::Result<Option<&JsonApiId>, RelationshipAssumptionError> {
         match self.data {
             IdentifierData::None => Ok(None),
             IdentifierData::Multiple(_) => Err(RelationshipAssumptionError::RelationshipIsAList),
@@ -409,7 +424,7 @@ impl Relationship {
         }
     }
 
-    pub fn as_ids(&self) -> Result<Option<JsonApiIds>, RelationshipAssumptionError> {
+    pub fn as_ids(&self) -> std::result::Result<Option<JsonApiIds>, RelationshipAssumptionError> {
         match self.data {
             IdentifierData::None => Ok(None),
             IdentifierData::Single(_) => Err(RelationshipAssumptionError::RelationshipIsNotAList),
