@@ -40,6 +40,7 @@ pub struct Resource {
     #[serde(rename = "type")]
     pub _type: String,
     pub id: JsonApiId,
+    #[serde(default)]
     pub attributes: ResourceAttributes,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub relationships: Option<Relationships>,
