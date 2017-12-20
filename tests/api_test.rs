@@ -518,3 +518,15 @@ fn it_omits_empty_error_keys() {
     assert_eq!(serde_json::to_string(&doc).unwrap(),
         r#"{"errors":[{"id":"error_id"}]}"#);
 }
+
+#[test]
+fn it_allows_for_optional_attributes() {
+    let _ = env_logger::init();
+    let serialized = r#"{
+            "data" : {
+                "id" :"1", "type" : "post", "relationships" : {}, "links" : {}
+            }
+        }"#;
+    let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(serialized);
+    assert_eq!(data.is_ok(), true);
+}
