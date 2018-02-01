@@ -44,5 +44,32 @@ fn to_jsonapi_document_and_back(){
 }
 
 #[test]
+fn numeric_id() {
+    #[derive(Debug, PartialEq, Serialize, Deserialize)]
+    struct NumericFlea {
+        id: i32,
+        name: String,
+    }
+    jsonapi_model!(NumericFlea; "numeric_flea");
+
+    let numeric = NumericFlea {
+        id: 2,
+        name: "rick".into(),
+    };
+    let doc = numeric.to_jsonapi_document();
+    let id = doc.data.as_ref().map(|primary| {
+        if let &PrimaryData::Single(ref res) = primary {
+            res.id.clone()
+        } else {
+            "".to_string()
+        }
+    });
+    assert_eq!(id, Some("2".to_string()));
+    let json = serde_json::to_string(&doc).unwrap();
+    let _num_doc: JsonApiDocument = serde_json::from_str(&json)
+        .expect("NumericFlea JsonApiDocument should be created from the numeric json");
+}
+
+#[test]
 fn from_jsonapi_document_and_back(){
 }
