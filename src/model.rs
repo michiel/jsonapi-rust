@@ -50,13 +50,10 @@ pub trait JsonApiModel: Serialize
 
     fn to_jsonapi_resource(&self) -> (Resource, Option<Resources>) {
         if let Value::Object(mut attrs) = to_value(self).unwrap(){
-            let id_value = attrs
-                .remove("id")
-                .unwrap_or_else(|| Value::String("".into()));
-
+            let _ = attrs.remove("id");
             let resource = Resource{
                 _type: self.jsonapi_type(),
-                id: from_value(id_value).unwrap_or_else(|_| "".into()),
+                id: self.jsonapi_id(),
                 relationships: self.build_relationships(),
                 attributes: Self::extract_attributes(&attrs),
                 ..Default::default()
