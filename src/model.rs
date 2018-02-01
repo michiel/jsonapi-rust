@@ -185,6 +185,37 @@ pub trait JsonApiModel: Serialize
     }
 }
 
+pub fn vec_to_jsonapi_resources<T: JsonApiModel>(
+    objects: Vec<T>,
+) -> (Resources, Option<Resources>) {
+    let mut included = vec![];
+    let resources = objects
+        .iter()
+        .map(|obj| {
+            let (res, mut opt_incl) = obj.to_jsonapi_resource();
+            if let Some(ref mut incl) = opt_incl {
+                included.append(incl);
+            }
+            res
+        })
+        .collect::<Vec<_>>();
+    let opt_included = if included.is_empty() {
+        None
+    } else {
+        Some(included)
+    };
+    (resources, opt_included)
+}
+
+pub fn vec_to_jsonapi_document<T: JsonApiModel>(objects: Vec<T>) -> JsonApiDocument {
+    let (resources, included) = vec_to_jsonapi_resources(objects);
+    JsonApiDocument {
+        data: Some(PrimaryData::Multiple(resources)),
+        included: included,
+        ..Default::default()
+    }
+}
+
 #[macro_export]
 macro_rules! jsonapi_model {
     ($model:ty; $type:expr) => (
