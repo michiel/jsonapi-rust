@@ -52,22 +52,34 @@ fn numeric_id() {
     }
     jsonapi_model!(NumericFlea; "numeric_flea");
 
-    let numeric = NumericFlea {
+    let flea = NumericFlea {
         id: 2,
         name: "rick".into(),
     };
-    let doc = numeric.to_jsonapi_document();
-    let id = doc.data.as_ref().map(|primary| {
-        if let &PrimaryData::Single(ref res) = primary {
-            res.id.clone()
-        } else {
-            "".to_string()
-        }
-    });
-    assert_eq!(id, Some("2".to_string()));
+    let (res, _) = flea.to_jsonapi_resource();
+    assert_eq!(res.id, "2".to_string());
+    let doc = flea.to_jsonapi_document();
+    assert!(doc.is_valid());
+    assert_eq!(doc.data, Some(PrimaryData::Single(Box::new(res))));
     let json = serde_json::to_string(&doc).unwrap();
     let _num_doc: JsonApiDocument = serde_json::from_str(&json)
-        .expect("NumericFlea JsonApiDocument should be created from the numeric json");
+        .expect("NumericFlea JsonApiDocument should be created from the flea json");
+}
+
+#[test]
+fn test_vec_to_jsonapi_document() {
+    let fleas = vec![
+        Flea {
+            id: "2".into(),
+            name: "rick".into(),
+        },
+        Flea {
+            id: "3".into(),
+            name: "morty".into(),
+        },
+    ];
+    let doc = vec_to_jsonapi_document(fleas);
+    assert!(doc.is_valid());
 }
 
 #[test]
