@@ -18,7 +18,7 @@ Add this crate to your _Cargo.toml_ file,
     [dependencies]
     jsonapi = "*"
 
-Using git
+Or use the master branch directly from github,
 
     [dependencies]
     jsonapi = { git = "https://github.com/michiel/jsonapi-rust", branch = "master" }
@@ -33,24 +33,6 @@ The command `cargo test` will run all tests. For more verbose output or output w
 
     RUST_BACKTRACE=1 cargo test -- --nocapture
     RUST_BACKTRACE=1 cargo watch "test -- --nocapture"
-
-### Clippy
-
-To run clippy, find a last known working version of nightly that runs with clippy,
-
-    rustup install nightly-2017-03-01
-    rustup run nightly-2017-03-01 cargo install clippy
-    rustup run nightly-2017-03-01 cargo clippy
-
-### Dependency scanning
-
-Check for outdated packages
-
-    cargo outdated
-
-Check packages for known vulnerabilities
-
-    cargo audit ; echo $?
 
 ## Contributing
 

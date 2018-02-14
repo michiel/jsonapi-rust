@@ -5,7 +5,8 @@
 
 *   Add conversion of object Vec to jsonapi_document ([1bf60a0](https://github.com/michiel/jsonapi-rust/commit/1bf60a0bd98f1027bb8cc42ddb8fc4ee36a61f4c))
 *   Support numeric id in JsonApiModel::to_jsonapi_* ([1f98c88](https://github.com/michiel/jsonapi-rust/commit/1f98c884b80f6d02f28df6d58686908c9068a585))
-*
+
+
 <a name=""></a>
 ##  0.5.3 (2017-12-20)
 
