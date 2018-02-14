@@ -23,7 +23,7 @@ pub trait JsonApiModel: Serialize
     fn build_included(&self) -> Option<Resources>;
 
     fn from_jsonapi_resource(resource: &Resource, included: &Option<Resources>)
-        -> Result<Self> 
+        -> Result<Self>
     {
         Self::from_serializable(Self::resource_to_attrs(resource, included))
     }
@@ -65,7 +65,7 @@ pub trait JsonApiModel: Serialize
         }
     }
 
-    
+
     fn to_jsonapi_document(&self) -> JsonApiDocument {
         let (resource, included) = self.to_jsonapi_resource();
         JsonApiDocument {
@@ -75,25 +75,25 @@ pub trait JsonApiModel: Serialize
         }
     }
 
-    
+
     #[doc(hidden)]
     fn build_has_one<M: JsonApiModel>(model: &M) -> Relationship {
-        Relationship{
-            data: IdentifierData::Single(model.as_resource_identifier()),
+        Relationship {
+            data: Some(IdentifierData::Single(model.as_resource_identifier())),
             links: None
         }
     }
-    
+
     #[doc(hidden)]
     fn build_has_many<M: JsonApiModel>(models: &[M]) -> Relationship {
-        Relationship{
-            data: IdentifierData::Multiple(
+        Relationship {
+            data: Some(IdentifierData::Multiple(
                 models.iter().map(|m| m.as_resource_identifier()).collect()
-            ),
+            )),
             links: None
         }
     }
-    
+
     #[doc(hidden)]
     fn as_resource_identifier(&self) -> ResourceIdentifier {
         ResourceIdentifier {
@@ -117,7 +117,7 @@ pub trait JsonApiModel: Serialize
             true
         }).map(|(k,v)|{ (k.clone(), v.clone()) }).collect()
     }
-    
+
     #[doc(hidden)]
     fn to_resources(&self) -> Resources {
         let (me, maybe_others) = self.to_jsonapi_resource();
@@ -130,7 +130,7 @@ pub trait JsonApiModel: Serialize
 
     #[doc(hidden)]
     fn lookup<'a>(needle: &ResourceIdentifier, haystack: &'a [Resource])
-        -> Option<&'a Resource> 
+        -> Option<&'a Resource>
     {
         for resource in haystack {
             if resource._type == needle._type && resource.id == needle.id {
@@ -142,7 +142,7 @@ pub trait JsonApiModel: Serialize
 
     #[doc(hidden)]
     fn resource_to_attrs(resource: &Resource, included: &Option<Resources>)
-        -> ResourceAttributes 
+        -> ResourceAttributes
     {
         let mut new_attrs = HashMap::new();
         new_attrs.clone_from(&resource.attributes);
@@ -152,14 +152,14 @@ pub trait JsonApiModel: Serialize
             if let Some(inc) = included.as_ref() {
                 for (name, relation) in relations {
                     let value = match relation.data {
-                        IdentifierData::None => Value::Null,
-                        IdentifierData::Single(ref identifier) => {
+                        Some(IdentifierData::None) => Value::Null,
+                        Some(IdentifierData::Single(ref identifier)) => {
                             let found = Self::lookup(identifier, inc)
                                 .map(|r| Self::resource_to_attrs(r, included) );
                             to_value(found)
                                 .expect("Casting Single relation to value")
                         },
-                        IdentifierData::Multiple(ref identifiers) => {
+                        Some(IdentifierData::Multiple(ref identifiers)) => {
                             let found: Vec<Option<ResourceAttributes>> =
                                 identifiers.iter().map(|id|{
                                     Self::lookup(id, inc).map(|r|{
@@ -169,6 +169,7 @@ pub trait JsonApiModel: Serialize
                             to_value(found)
                                 .expect("Casting Multiple relation to value")
                         },
+                        None => Value::Null,
                     };
                     new_attrs.insert(name.to_string(), value);
                 }
@@ -253,7 +254,7 @@ macro_rules! jsonapi_model {
 
                 Some(FIELDS)
             }
-            
+
             fn build_relationships(&self) -> Option<Relationships> {
                 let mut relationships = HashMap::new();
                 $(
@@ -268,7 +269,7 @@ macro_rules! jsonapi_model {
                 )*
                 Some(relationships)
             }
-            
+
             fn build_included(&self) -> Option<Resources> {
                 let mut included:Resources = vec![];
                 $( included.append(&mut self.$has_one.to_resources()); )*
