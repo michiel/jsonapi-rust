@@ -7,9 +7,12 @@
 *   Use and serialize sparse structs ([75b6bac](https://github.com/michiel/jsonapi-rust/commit/75b6bacf8cff34d03dcfa19e1fc5d743578be2dc))
 *   model serialization and deserialization working ([d38093e](https://github.com/michiel/jsonapi-rust/commit/d38093e429afbf0f6f7c49e67db0aa89d7c69915))
 *   Implement FromStr for JsonApiDocument and Resource ([fb66803](https://github.com/michiel/jsonapi-rust/commit/fb66803252dd7866713ce93741548a45ba2596ab))
-*   fix issues with static slice reference on stable ([647f93a](https://github.com/michiel/jsonapi-rust/commit/647f93a0425eff446c10e644ecfc19f957375ecc))
 *   Update 'serde*' minimal versions and relax version restrictions ([3723938](https://github.com/michiel/jsonapi-rust/commit/3723938dfa9755cebdbaad6ec8a862a6ad7a529c))
 *   Use an empty HashMap if attributes is not supplied ([e0d3712](https://github.com/michiel/jsonapi-rust/commit/e0d3712c9b63e8c04d6e2e8c4df6dfc7eddbef11))
+
+#### Bugfixes
+
+*   fix issues with static slice reference on stable ([647f93a](https://github.com/michiel/jsonapi-rust/commit/647f93a0425eff446c10e644ecfc19f957375ecc))
 
 
 <a name=""></a>
