@@ -8,7 +8,8 @@
 
 This is an implementation of the JSON-API v1 specification at [jsonapi.org](http://jsonapi.org/).
 
-[Documentation](https://docs.rs/jsonapi)
+  * [API Documentation at docs.rs](https://docs.rs/jsonapi)
+  * [CHANGELOG](https://github.com/michiel/jsonapi-rust/blob/master/CHANGELOG.md)
 
 ## Use
 
@@ -51,8 +52,11 @@ Check packages for known vulnerabilities
 
     cargo audit ; echo $?
 
-### Changes and changelog generation
+## Contributing
 
-Commit messages are written using [conventional](https://github.com/conventional-changelog/conventional-changelog/blob/a5505865ff3dd710cf757f50530e73ef0ca641da/conventions/angular.md) format. The Changelog is updated using the [clog](https://github.com/clog-tool/clog-cli) tool. The configuration is found in `.clog.toml`.
+Contributions are welcome. Please add tests and write commit messages using 
+using [conventional](https://github.com/conventional-changelog/conventional-changelog/blob/a5505865ff3dd710cf757f50530e73ef0ca641da/conventions/angular.md) format. The Changelog is updated using the [clog](https://github.com/clog-tool/clog-cli) tool. The configuration is found in `.clog.toml`.
+
+The current configuration works for commit messages prefixed with `feat:`, `bug:`, `test:`, `doc:` and `refactor:`.
 
 
