@@ -1,0 +1,284 @@
+{
+  "data": {
+    "id": "1",
+    "type": "authors",
+    "attributes": {
+      "name": "J. R. R. Tolkien"
+    },
+    "relationships": {
+      "books": {
+        "data": [
+          {
+            "id": "1",
+            "type": "books"
+          },
+          {
+            "id": "2",
+            "type": "books"
+          },
+          {
+            "id": "3",
+            "type": "books"
+          }
+        ]
+      }
+    }
+  },
+  "included": [
+    {
+      "id": "1",
+      "type": "books",
+      "attributes": {
+        "title": "The Fellowship of the Ring"
+      },
+      "relationships": {
+        "chapters": {
+          "data": [
+            {
+              "id": "1",
+              "type": "chapters"
+            },
+            {
+              "id": "2",
+              "type": "chapters"
+            },
+            {
+              "id": "3",
+              "type": "chapters"
+            }
+          ]
+        },
+        "first_chapter": {
+          "data": {
+            "id": "1",
+            "type": "chapters"
+          }
+        },
+        "author": {
+          "data": {
+            "id": "1",
+            "type": "authors"
+          }
+        }
+      }
+    },
+    {
+      "id": "2",
+      "type": "books",
+      "attributes": {
+        "title": "The Two Towers"
+      },
+      "relationships": {
+        "chapters": {
+          "data": [
+            {
+              "id": "23",
+              "type": "chapters"
+            },
+            {
+              "id": "24",
+              "type": "chapters"
+            },
+            {
+              "id": "25",
+              "type": "chapters"
+            }
+          ]
+        },
+        "first_chapter": {
+          "data": {
+            "id": "23",
+            "type": "chapters"
+          }
+        },
+        "author": {
+          "data": {
+            "id": "1",
+            "type": "authors"
+          }
+        }
+      }
+    },
+    {
+      "id": "3",
+      "type": "books",
+      "attributes": {
+        "title": "Return of the King"
+      },
+      "relationships": {
+        "chapters": {
+          "data": [
+            {
+              "id": "44",
+              "type": "chapters"
+            },
+            {
+              "id": "45",
+              "type": "chapters"
+            },
+            {
+              "id": "46",
+              "type": "chapters"
+            }
+          ]
+        },
+        "first_chapter": {
+          "data": {
+            "id": "44",
+            "type": "chapters"
+          }
+        },
+        "author": {
+          "data": {
+            "id": "1",
+            "type": "authors"
+          }
+        }
+      }
+    },
+    {
+      "id": "1",
+      "type": "chapters",
+      "attributes": {
+        "title": "A Long-expected Party",
+        "ordering": 1
+      },
+      "relationships": {
+        "book": {
+          "data": {
+            "id": "1",
+            "type": "books"
+          }
+        }
+      }
+    },
+    {
+      "id": "2",
+      "type": "chapters",
+      "attributes": {
+        "title": "The Shadow of the Past",
+        "ordering": 2
+      },
+      "relationships": {
+        "book": {
+          "data": {
+            "id": "1",
+            "type": "books"
+          }
+        }
+      }
+    },
+    {
+      "id": "3",
+      "type": "chapters",
+      "attributes": {
+        "title": "Three is Company",
+        "ordering": 3
+      },
+      "relationships": {
+        "book": {
+          "data": {
+            "id": "1",
+            "type": "books"
+          }
+        }
+      }
+    },
+    {
+      "id": "23",
+      "type": "chapters",
+      "attributes": {
+        "title": "The Departure of Boromir",
+        "ordering": 1
+      },
+      "relationships": {
+        "book": {
+          "data": {
+            "id": "2",
+            "type": "books"
+          }
+        }
+      }
+    },
+    {
+      "id": "24",
+      "type": "chapters",
+      "attributes": {
+        "title": "The Riders of Rohan",
+        "ordering": 2
+      },
+      "relationships": {
+        "book": {
+          "data": {
+            "id": "2",
+            "type": "books"
+          }
+        }
+      }
+    },
+    {
+      "id": "25",
+      "type": "chapters",
+      "attributes": {
+        "title": "The Uruk-hai",
+        "ordering": 3
+      },
+      "relationships": {
+        "book": {
+          "data": {
+            "id": "2",
+            "type": "books"
+          }
+        }
+      }
+    },
+    {
+      "id": "44",
+      "type": "chapters",
+      "attributes": {
+        "title": "Minas Tirith",
+        "ordering": 1
+      },
+      "relationships": {
+        "book": {
+          "data": {
+            "id": "3",
+            "type": "books"
+          }
+        }
+      }
+    },
+    {
+      "id": "45",
+      "type": "chapters",
+      "attributes": {
+        "title": "The Passing of the Grey Company",
+        "ordering": 2
+      },
+      "relationships": {
+        "book": {
+          "data": {
+            "id": "3",
+            "type": "books"
+          }
+        }
+      }
+    },
+    {
+      "id": "46",
+      "type": "chapters",
+      "attributes": {
+        "title": "The Muster of Rohan",
+        "ordering": 3
+      },
+      "relationships": {
+        "book": {
+          "data": {
+            "id": "3",
+            "type": "books"
+          }
+        }
+      }
+    }
+  ]
+}
