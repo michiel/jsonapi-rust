@@ -38,7 +38,7 @@ impl Query {
 
         match parse(params) {
             Ok(o) => {
-                let include = match o.find("include") {
+                let include = match o.pointer("/include") {
                     None => None,
                     Some(inc) => {
                         match inc.as_str() {
@@ -54,7 +54,7 @@ impl Query {
 
                 let mut fields = HashMap::<String, Vec<String>>::new();
 
-                o.find("fields").map(|x| if x.is_object() {
+                o.pointer("/fields").map(|x| if x.is_object() {
                     x.as_object().map(|obj| for (key, value) in obj.iter() {
                         let arr: Vec<String> = match value.as_str() {
                             Some(string) => string.split(',').map(|s| s.to_string()).collect(),
@@ -68,7 +68,7 @@ impl Query {
                 });
 
                 let page = PageParams {
-                    number: match o.find_path(&["page", "number"]) {
+                    number: match o.pointer("/page/number") {
                         None => {
                             warn!("Query::from_params : No page/number found in {:?}, setting \
                                    default 0",
@@ -94,7 +94,7 @@ impl Query {
                             }
                         }
                     },
-                    size: match o.find_path(&["page", "size"]) {
+                    size: match o.pointer("/page/size") {
                         None => {
                             warn!("Query::from_params : No page/size found in {:?}, setting \
                                    default 0",
