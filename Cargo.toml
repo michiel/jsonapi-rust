@@ -20,7 +20,7 @@ log = "0.3"
 error-chain = "^0.12.0"
 
 [dev-dependencies]
-env_logger = "0.3"
+env_logger = "0.5"
 
 [badges]
 travis-ci = { repository = "https://travis-ci.org/michiel/jsonapi-rust/", branch = "master" }
