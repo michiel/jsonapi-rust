@@ -54,18 +54,22 @@ impl Query {
 
                 let mut fields = HashMap::<String, Vec<String>>::new();
 
-                o.pointer("/fields").map(|x| if x.is_object() {
-                    x.as_object().map(|obj| for (key, value) in obj.iter() {
-                        let arr: Vec<String> = match value.as_str() {
-                            Some(string) => string.split(',').map(|s| s.to_string()).collect(),
-                            None => Vec::<String>::new(),
-                        };
-                        fields.insert(key.to_string(), arr);
+                if let Some(x) = o.pointer("/fields") {
+                    if x.is_object() {
+                        if let Some(obj) = x.as_object() {
+                            for (key, value) in obj.iter() {
+                                let arr: Vec<String> = match value.as_str() {
+                                    Some(string) => string.split(',').map(|s| s.to_string()).collect(),
+                                    None => Vec::<String>::new(),
+                                };
+                                fields.insert(key.to_string(), arr);
 
-                    });
-                } else {
-                    error!("Query::from_params : No fields found in {:?}", x);
-                });
+                            }
+                        }
+                    } else {
+                        error!("Query::from_params : No fields found in {:?}", x);
+                    }
+                }
 
                 let page = PageParams {
                     number: match o.pointer("/page/number") {
@@ -124,7 +128,7 @@ impl Query {
 
                 Query {
                     _type: "none".into(),
-                    include: include,
+                    include,
                     fields: Some(fields),
                     page: Some(page),
                 }
