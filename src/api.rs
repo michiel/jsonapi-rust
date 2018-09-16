@@ -332,7 +332,10 @@ impl Resource {
 
     pub fn diff(&self, other: Resource) -> std::result::Result<PatchSet, DiffPatchError> {
         if self._type != other._type {
-            Err(DiffPatchError::IncompatibleTypes(self._type.clone(), other._type.clone()))
+            Err(DiffPatchError::IncompatibleTypes(
+                self._type.clone(),
+                other._type.clone(),
+            ))
         } else {
 
             let mut self_keys: Vec<String> =
@@ -340,12 +343,19 @@ impl Resource {
 
             self_keys.sort();
 
-            let mut other_keys: Vec<String> =
-                other.attributes.iter().map(|(key, _)| key.clone()).collect();
+            let mut other_keys: Vec<String> = other
+                .attributes
+                .iter()
+                .map(|(key, _)| key.clone())
+                .collect();
 
             other_keys.sort();
 
-            let matching = self_keys.iter().zip(other_keys.iter()).filter(|&(a, b)| a == b).count();
+            let matching = self_keys
+                .iter()
+                .zip(other_keys.iter())
+                .filter(|&(a, b)| a == b)
+                .count();
 
             if matching != self_keys.len() {
                 Err(DiffPatchError::DifferentAttributeKeys)
@@ -355,9 +365,11 @@ impl Resource {
                 for (attr, self_value) in &self.attributes {
                     match other.attributes.get(attr) {
                         None => {
-                            error!("Resource::diff unable to find attribute {:?} in {:?}",
-                                   attr,
-                                   other);
+                            error!(
+                                "Resource::diff unable to find attribute {:?} in {:?}",
+                                attr,
+                                other
+                            );
                         }
                         Some(other_value) => {
                             if self_value != other_value {
@@ -381,7 +393,10 @@ impl Resource {
     pub fn patch(&mut self, patchset: PatchSet) -> Result<Resource> {
         let mut res = self.clone();
         for patch in &patchset.patches {
-            res.attributes.insert(patch.subject.clone(), patch.next.clone());
+            res.attributes.insert(
+                patch.subject.clone(),
+                patch.next.clone(),
+            );
         }
         Ok(res)
     }
@@ -411,7 +426,7 @@ impl FromStr for Resource {
     /// assert_eq!(data.is_ok(), true);
     /// ```
     fn from_str(s: &str) -> Result<Self> {
-        serde_json::from_str(s).chain_err(|| "Error parsing resource" )
+        serde_json::from_str(s).chain_err(|| "Error parsing resource")
     }
 }
 

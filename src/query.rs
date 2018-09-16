@@ -59,7 +59,9 @@ impl Query {
                         if let Some(obj) = x.as_object() {
                             for (key, value) in obj.iter() {
                                 let arr: Vec<String> = match value.as_str() {
-                                    Some(string) => string.split(',').map(|s| s.to_string()).collect(),
+                                    Some(string) => {
+                                        string.split(',').map(|s| s.to_string()).collect()
+                                    }
                                     None => Vec::<String>::new(),
                                 };
                                 fields.insert(key.to_string(), arr);
@@ -74,9 +76,11 @@ impl Query {
                 let page = PageParams {
                     number: match o.pointer("/page/number") {
                         None => {
-                            warn!("Query::from_params : No page/number found in {:?}, setting \
+                            warn!(
+                                "Query::from_params : No page/number found in {:?}, setting \
                                    default 0",
-                                  o);
+                                o
+                            );
                             0
                         }
                         Some(num) => {
@@ -84,25 +88,31 @@ impl Query {
                                 match num.as_str().map(str::parse::<i64>) {
                                     Some(y) => y.unwrap_or(0),
                                     None => {
-                                        warn!("Query::from_params : page/number found in {:?}, \
+                                        warn!(
+                                            "Query::from_params : page/number found in {:?}, \
                                                not able not able to parse it - setting default 0",
-                                              o);
+                                            o
+                                        );
                                         0
                                     }
                                 }
                             } else {
-                                warn!("Query::from_params : page/number found in {:?}, but it is \
+                                warn!(
+                                    "Query::from_params : page/number found in {:?}, but it is \
                                        not an expected type - setting default 0",
-                                      o);
+                                    o
+                                );
                                 0
                             }
                         }
                     },
                     size: match o.pointer("/page/size") {
                         None => {
-                            warn!("Query::from_params : No page/size found in {:?}, setting \
+                            warn!(
+                                "Query::from_params : No page/size found in {:?}, setting \
                                    default 0",
-                                  o);
+                                o
+                            );
                             0
                         }
                         Some(num) => {
@@ -110,16 +120,20 @@ impl Query {
                                 match num.as_str().map(str::parse::<i64>) {
                                     Some(y) => y.unwrap_or(0),
                                     None => {
-                                        warn!("Query::from_params : page/size found in {:?}, \
+                                        warn!(
+                                            "Query::from_params : page/size found in {:?}, \
                                                not able not able to parse it - setting default 0",
-                                              o);
+                                            o
+                                        );
                                         0
                                     }
                                 }
                             } else {
-                                warn!("Query::from_params : page/size found in {:?}, but it is \
+                                warn!(
+                                    "Query::from_params : page/size found in {:?}, but it is \
                                        not an expected type - setting default 0",
-                                      o);
+                                    o
+                                );
                                 0
                             }
                         }
