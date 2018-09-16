@@ -115,7 +115,7 @@ fn jsonapi_document_invalid_errors() {
 
     let errors = JsonApiErrors::new();
 
-    let no_content_document : JsonApiDocument = Default::default();
+    let no_content_document: JsonApiDocument = Default::default();
 
     match no_content_document.validate() {
         None => assert!(false),
@@ -155,7 +155,9 @@ fn jsonapi_document_invalid_errors() {
     match included_without_data_document.validate() {
         None => assert!(false),
         Some(errors) => {
-            assert!(errors.contains(&DocumentValidationError::IncludedWithoutData));
+            assert!(errors.contains(
+                &DocumentValidationError::IncludedWithoutData,
+            ));
         }
     }
 }
@@ -251,8 +253,10 @@ fn api_document_from_json_file() {
                     assert_eq!(arr.len(), 1);
                 }
                 Some(PrimaryData::Single(_)) => {
-                    println!("api_document_from_json_file : Expected one Resource in a vector, \
-                              not a direct Resource");
+                    println!(
+                        "api_document_from_json_file : Expected one Resource in a vector, \
+                              not a direct Resource"
+                    );
                     assert!(false);
                 }
                 Some(PrimaryData::None) => {
@@ -284,13 +288,17 @@ fn api_document_collection_from_json_file() {
                     assert_eq!(arr.len(), 1);
                 }
                 Some(PrimaryData::Single(_)) => {
-                    println!("api_document_collection_from_json_file : Expected one Resource in \
-                              a vector, not a direct Resource");
+                    println!(
+                        "api_document_collection_from_json_file : Expected one Resource in \
+                              a vector, not a direct Resource"
+                    );
                     assert!(false);
                 }
                 Some(PrimaryData::None) => {
-                    println!("api_document_collection_from_json_file : Expected one Resource in \
-                              a vector");
+                    println!(
+                        "api_document_collection_from_json_file : Expected one Resource in \
+                              a vector"
+                    );
                     assert!(false);
                 }
                 None => assert!(false),
@@ -304,8 +312,10 @@ fn api_document_collection_from_json_file() {
                     assert_eq!(arr[2].id, "12");
                 }
                 None => {
-                    println!("api_document_collection_from_json_file : Expected three Resources \
-                              in 'included' in a vector");
+                    println!(
+                        "api_document_collection_from_json_file : Expected three Resources \
+                              in 'included' in a vector"
+                    );
                     assert!(false);
                 }
             }
@@ -491,8 +501,10 @@ fn it_omits_empty_document_and_primary_data_keys() {
         ..Default::default()
     };
 
-    assert_eq!(serde_json::to_string(&doc).unwrap(),
-        r#"{"data":{"type":"test","id":"123","attributes":{}}}"#);
+    assert_eq!(
+        serde_json::to_string(&doc).unwrap(),
+        r#"{"data":{"type":"test","id":"123","attributes":{}}}"#
+    );
 }
 
 #[test]
@@ -507,7 +519,7 @@ fn it_does_not_omit_an_empty_primary_data() {
 
 #[test]
 fn it_omits_empty_error_keys() {
-    let error = JsonApiError{
+    let error = JsonApiError {
         id: Some("error_id".to_string()),
         ..Default::default()
     };
@@ -515,8 +527,10 @@ fn it_omits_empty_error_keys() {
         errors: Some(vec![error]),
         ..Default::default()
     };
-    assert_eq!(serde_json::to_string(&doc).unwrap(),
-        r#"{"errors":[{"id":"error_id"}]}"#);
+    assert_eq!(
+        serde_json::to_string(&doc).unwrap(),
+        r#"{"errors":[{"id":"error_id"}]}"#
+    );
 }
 
 #[test]
