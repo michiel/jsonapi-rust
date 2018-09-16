@@ -171,16 +171,16 @@ impl PatchSet {
 /// Top-level JSON-API Document
 impl JsonApiDocument {
     fn has_errors(&self) -> bool {
-        !self.errors.is_none()
+        self.errors.is_some()
     }
     fn has_meta(&self) -> bool {
-        !self.errors.is_none()
+        self.errors.is_some()
     }
     fn has_included(&self) -> bool {
-        !self.included.is_none()
+        self.included.is_some()
     }
     fn has_data(&self) -> bool {
-        !self.data.is_none()
+        self.data.is_some()
     }
     /// This function returns `false` if the `JsonApiDocument` contains any violations of the
     /// specification. See `DocumentValidationError`
@@ -360,7 +360,7 @@ impl Resource {
                                    other);
                         }
                         Some(other_value) => {
-                            if self_value.to_string() != other_value.to_string() {
+                            if self_value != other_value {
                                 patchset.push(Patch {
                                     patch_type: PatchType::Attribute,
                                     subject: attr.clone(),

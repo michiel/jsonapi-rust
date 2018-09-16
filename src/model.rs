@@ -65,17 +65,17 @@ pub trait JsonApiModel: Serialize
         }
     }
 
-    
+
     fn to_jsonapi_document(&self) -> JsonApiDocument {
         let (resource, included) = self.to_jsonapi_resource();
         JsonApiDocument {
             data: Some(PrimaryData::Single(Box::new(resource))),
-            included: included,
+            included,
             ..Default::default()
         }
     }
 
-    
+
     #[doc(hidden)]
     fn build_has_one<M: JsonApiModel>(model: &M) -> Relationship {
         Relationship{
@@ -83,7 +83,7 @@ pub trait JsonApiModel: Serialize
             links: None
         }
     }
-    
+
     #[doc(hidden)]
     fn build_has_many<M: JsonApiModel>(models: &[M]) -> Relationship {
         Relationship{
@@ -211,7 +211,7 @@ pub fn vec_to_jsonapi_document<T: JsonApiModel>(objects: Vec<T>) -> JsonApiDocum
     let (resources, included) = vec_to_jsonapi_resources(objects);
     JsonApiDocument {
         data: Some(PrimaryData::Multiple(resources)),
-        included: included,
+        included,
         ..Default::default()
     }
 }
