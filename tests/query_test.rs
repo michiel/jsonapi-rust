@@ -6,14 +6,13 @@ use jsonapi::query::*;
 #[test]
 fn can_print() {
     let _ = env_logger::try_init();
-    let query = Query::from_params("include=author&fields[articles]=title,\
-                                    body&fields[people]=name&page[number]=3&page[size]=1");
+    let query = Query::from_params(
+        "include=author&fields[articles]=title,\
+                                    body&fields[people]=name&page[number]=3&page[size]=1",
+    );
     println!("Query is {:?}", query);
 
-    let pageparams = PageParams {
-        size: 1,
-        number: 1,
-    };
+    let pageparams = PageParams { size: 1, number: 1 };
 
     println!("PageParams is {:?}", pageparams);
 }
@@ -21,8 +20,10 @@ fn can_print() {
 #[test]
 fn can_parse() {
     let _ = env_logger::try_init();
-    let query = Query::from_params("include=author&fields[articles]=title,\
-                                    body&fields[people]=name&page[number]=3&page[size]=1");
+    let query = Query::from_params(
+        "include=author&fields[articles]=title,\
+                                    body&fields[people]=name&page[number]=3&page[size]=1",
+    );
 
     match query.include {
         None => assert!(false),
@@ -241,8 +242,14 @@ fn can_generate_string_fields_multiple_key_and_values() {
     // We don't have any guarantees on the order in which fields are output
     //
 
-    assert!(query_string.eq("fields[item]=title,description&fields[user]=name,dateofbirth") ||
-            query_string.eq("fields[user]=name,dateofbirth&fields[item]=title,description"));
+    assert!(
+        query_string.eq(
+            "fields[item]=title,description&fields[user]=name,dateofbirth",
+        ) ||
+            query_string.eq(
+                "fields[user]=name,dateofbirth&fields[item]=title,description",
+            )
+    );
 }
 
 #[test]
