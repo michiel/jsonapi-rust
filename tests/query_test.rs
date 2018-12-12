@@ -5,24 +5,25 @@ use jsonapi::query::*;
 
 #[test]
 fn can_print() {
-    let _ = env_logger::init();
-    let query = Query::from_params("include=author&fields[articles]=title,\
-                                    body&fields[people]=name&page[number]=3&page[size]=1");
+    let _ = env_logger::try_init();
+    let query = Query::from_params(
+        "include=author&fields[articles]=title,\
+                                    body&fields[people]=name&page[number]=3&page[size]=1",
+    );
     println!("Query is {:?}", query);
 
-    let pageparams = PageParams {
-        size: 1,
-        number: 1,
-    };
+    let pageparams = PageParams { size: 1, number: 1 };
 
     println!("PageParams is {:?}", pageparams);
 }
 
 #[test]
 fn can_parse() {
-    let _ = env_logger::init();
-    let query = Query::from_params("include=author&fields[articles]=title,\
-                                    body&fields[people]=name&page[number]=3&page[size]=1");
+    let _ = env_logger::try_init();
+    let query = Query::from_params(
+        "include=author&fields[articles]=title,\
+                                    body&fields[people]=name&page[number]=3&page[size]=1",
+    );
 
     match query.include {
         None => assert!(false),
@@ -68,7 +69,7 @@ fn can_parse() {
 
 #[test]
 fn can_parse_and_provide_defaults_for_missing_values() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let query = Query::from_params("");
 
     match query.include {
@@ -92,7 +93,7 @@ fn can_parse_and_provide_defaults_for_missing_values() {
 
 #[test]
 fn can_parse_and_use_defaults_for_invalid_values() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let query = Query::from_params("page[number]=x&page[size]=y");
 
     match query.include {
@@ -116,7 +117,7 @@ fn can_parse_and_use_defaults_for_invalid_values() {
 
 #[test]
 fn can_provide_and_empty_struct() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let query = Query::from_params("!");
 
     match query.include {
@@ -137,7 +138,7 @@ fn can_provide_and_empty_struct() {
 
 #[test]
 fn can_generate_string_empty() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let query = Query {
         _type: "none".into(),
         include: None,
@@ -152,7 +153,7 @@ fn can_generate_string_empty() {
 
 #[test]
 fn can_generate_string_include() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let query = Query {
         _type: "none".into(),
         include: Some(vec!["author".into()]),
@@ -167,7 +168,7 @@ fn can_generate_string_include() {
 
 #[test]
 fn can_generate_string_include_multiple() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let query = Query {
         _type: "none".into(),
         include: Some(vec!["author".into(), "publisher".into()]),
@@ -182,7 +183,7 @@ fn can_generate_string_include_multiple() {
 
 #[test]
 fn can_generate_string_fields() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     type VecOfStrings = Vec<String>;
     let mut fields = std::collections::HashMap::<String, VecOfStrings>::new();
 
@@ -202,7 +203,7 @@ fn can_generate_string_fields() {
 
 #[test]
 fn can_generate_string_fields_multiple_values() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     type VecOfStrings = Vec<String>;
     let mut fields = std::collections::HashMap::<String, VecOfStrings>::new();
 
@@ -222,7 +223,7 @@ fn can_generate_string_fields_multiple_values() {
 
 #[test]
 fn can_generate_string_fields_multiple_key_and_values() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     type VecOfStrings = Vec<String>;
     let mut fields = std::collections::HashMap::<String, VecOfStrings>::new();
 
@@ -241,13 +242,19 @@ fn can_generate_string_fields_multiple_key_and_values() {
     // We don't have any guarantees on the order in which fields are output
     //
 
-    assert!(query_string.eq("fields[item]=title,description&fields[user]=name,dateofbirth") ||
-            query_string.eq("fields[user]=name,dateofbirth&fields[item]=title,description"));
+    assert!(
+        query_string.eq(
+            "fields[item]=title,description&fields[user]=name,dateofbirth",
+        ) ||
+            query_string.eq(
+                "fields[user]=name,dateofbirth&fields[item]=title,description",
+            )
+    );
 }
 
 #[test]
 fn can_generate_page_fields() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
 
     let query = Query {
         _type: "none".into(),

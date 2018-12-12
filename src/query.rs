@@ -38,7 +38,7 @@ impl Query {
 
         match parse(params) {
             Ok(o) => {
-                let include = match o.find("include") {
+                let include = match o.pointer("/include") {
                     None => None,
                     Some(inc) => {
                         match inc.as_str() {
@@ -54,25 +54,33 @@ impl Query {
 
                 let mut fields = HashMap::<String, Vec<String>>::new();
 
-                o.find("fields").map(|x| if x.is_object() {
-                    x.as_object().map(|obj| for (key, value) in obj.iter() {
-                        let arr: Vec<String> = match value.as_str() {
-                            Some(string) => string.split(',').map(|s| s.to_string()).collect(),
-                            None => Vec::<String>::new(),
-                        };
-                        fields.insert(key.to_string(), arr);
+                if let Some(x) = o.pointer("/fields") {
+                    if x.is_object() {
+                        if let Some(obj) = x.as_object() {
+                            for (key, value) in obj.iter() {
+                                let arr: Vec<String> = match value.as_str() {
+                                    Some(string) => {
+                                        string.split(',').map(|s| s.to_string()).collect()
+                                    }
+                                    None => Vec::<String>::new(),
+                                };
+                                fields.insert(key.to_string(), arr);
 
-                    });
-                } else {
-                    error!("Query::from_params : No fields found in {:?}", x);
-                });
+                            }
+                        }
+                    } else {
+                        error!("Query::from_params : No fields found in {:?}", x);
+                    }
+                }
 
                 let page = PageParams {
-                    number: match o.find_path(&["page", "number"]) {
+                    number: match o.pointer("/page/number") {
                         None => {
-                            warn!("Query::from_params : No page/number found in {:?}, setting \
+                            warn!(
+                                "Query::from_params : No page/number found in {:?}, setting \
                                    default 0",
-                                  o);
+                                o
+                            );
                             0
                         }
                         Some(num) => {
@@ -80,25 +88,31 @@ impl Query {
                                 match num.as_str().map(str::parse::<i64>) {
                                     Some(y) => y.unwrap_or(0),
                                     None => {
-                                        warn!("Query::from_params : page/number found in {:?}, \
+                                        warn!(
+                                            "Query::from_params : page/number found in {:?}, \
                                                not able not able to parse it - setting default 0",
-                                              o);
+                                            o
+                                        );
                                         0
                                     }
                                 }
                             } else {
-                                warn!("Query::from_params : page/number found in {:?}, but it is \
+                                warn!(
+                                    "Query::from_params : page/number found in {:?}, but it is \
                                        not an expected type - setting default 0",
-                                      o);
+                                    o
+                                );
                                 0
                             }
                         }
                     },
-                    size: match o.find_path(&["page", "size"]) {
+                    size: match o.pointer("/page/size") {
                         None => {
-                            warn!("Query::from_params : No page/size found in {:?}, setting \
+                            warn!(
+                                "Query::from_params : No page/size found in {:?}, setting \
                                    default 0",
-                                  o);
+                                o
+                            );
                             0
                         }
                         Some(num) => {
@@ -106,16 +120,20 @@ impl Query {
                                 match num.as_str().map(str::parse::<i64>) {
                                     Some(y) => y.unwrap_or(0),
                                     None => {
-                                        warn!("Query::from_params : page/size found in {:?}, \
+                                        warn!(
+                                            "Query::from_params : page/size found in {:?}, \
                                                not able not able to parse it - setting default 0",
-                                              o);
+                                            o
+                                        );
                                         0
                                     }
                                 }
                             } else {
-                                warn!("Query::from_params : page/size found in {:?}, but it is \
+                                warn!(
+                                    "Query::from_params : page/size found in {:?}, but it is \
                                        not an expected type - setting default 0",
-                                      o);
+                                    o
+                                );
                                 0
                             }
                         }
@@ -124,7 +142,7 @@ impl Query {
 
                 Query {
                     _type: "none".into(),
-                    include: include,
+                    include,
                     fields: Some(fields),
                     page: Some(page),
                 }

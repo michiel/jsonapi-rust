@@ -8,7 +8,8 @@
 
 This is an implementation of the JSON-API v1 specification at [jsonapi.org](http://jsonapi.org/).
 
-[Documentation](https://docs.rs/jsonapi)
+  * [API Documentation at docs.rs](https://docs.rs/jsonapi)
+  * [CHANGELOG](https://github.com/michiel/jsonapi-rust/blob/master/CHANGELOG.md)
 
 ## Use
 
@@ -17,7 +18,7 @@ Add this crate to your _Cargo.toml_ file,
     [dependencies]
     jsonapi = "*"
 
-Using git
+Or use the master branch directly from github,
 
     [dependencies]
     jsonapi = { git = "https://github.com/michiel/jsonapi-rust", branch = "master" }
@@ -33,26 +34,10 @@ The command `cargo test` will run all tests. For more verbose output or output w
     RUST_BACKTRACE=1 cargo test -- --nocapture
     RUST_BACKTRACE=1 cargo watch "test -- --nocapture"
 
-### Clippy
+## Contributing
 
-To run clippy, find a last known working version of nightly that runs with clippy,
+Contributions are welcome. Please add tests and write commit messages using 
+using [conventional](https://github.com/conventional-changelog/conventional-changelog/blob/a5505865ff3dd710cf757f50530e73ef0ca641da/conventions/angular.md) format. The Changelog is updated using the [clog](https://github.com/clog-tool/clog-cli) tool. The configuration is found in `.clog.toml`.
 
-    rustup install nightly-2017-03-01
-    rustup run nightly-2017-03-01 cargo install clippy
-    rustup run nightly-2017-03-01 cargo clippy
-
-### Dependency scanning
-
-Check for outdated packages
-
-    cargo outdated
-
-Check packages for known vulnerabilities
-
-    cargo audit ; echo $?
-
-### Changes and changelog generation
-
-Commit messages are written using [conventional](https://github.com/conventional-changelog/conventional-changelog/blob/a5505865ff3dd710cf757f50530e73ef0ca641da/conventions/angular.md) format. The Changelog is updated using the [clog](https://github.com/clog-tool/clog-cli) tool. The configuration is found in `.clog.toml`.
-
+The current configuration works for commit messages prefixed with `feat:`, `bug:`, `test:`, `doc:` and `refactor:`.
 

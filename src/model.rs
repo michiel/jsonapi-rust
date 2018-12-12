@@ -9,7 +9,8 @@ use serde_json::{from_value, to_value, Value, Map};
 /// You shouldn't be implementing JsonApiModel manually, look at the
 /// `jsonapi_model!` macro instead.
 pub trait JsonApiModel: Serialize
-    where for<'de> Self: Deserialize<'de>
+where
+    for<'de> Self: Deserialize<'de>,
 {
     #[doc(hidden)]
     fn jsonapi_type(&self) -> String;
@@ -25,6 +26,7 @@ pub trait JsonApiModel: Serialize
     fn from_jsonapi_resource(resource: &Resource, included: &Option<Resources>)
         -> Result<Self>
     {
+
         Self::from_serializable(Self::resource_to_attrs(resource, included))
     }
 
@@ -33,8 +35,9 @@ pub trait JsonApiModel: Serialize
             Some(primary_data) => {
                 match *primary_data {
                     PrimaryData::None => bail!("Document had no data"),
-                    PrimaryData::Single(ref resource) =>
-                        Self::from_jsonapi_resource(resource, &doc.included),
+                    PrimaryData::Single(ref resource) => {
+                        Self::from_jsonapi_resource(resource, &doc.included)
+                    }
                     PrimaryData::Multiple(ref resources) => {
                         let all: Vec<ResourceAttributes> = resources
                             .iter()
@@ -43,15 +46,15 @@ pub trait JsonApiModel: Serialize
                         Self::from_serializable(all)
                     }
                 }
-            },
-            None => bail!("Document had no data")
+            }
+            None => bail!("Document had no data"),
         }
     }
 
     fn to_jsonapi_resource(&self) -> (Resource, Option<Resources>) {
-        if let Value::Object(mut attrs) = to_value(self).unwrap(){
+        if let Value::Object(mut attrs) = to_value(self).unwrap() {
             let _ = attrs.remove("id");
-            let resource = Resource{
+            let resource = Resource {
                 _type: self.jsonapi_type(),
                 id: self.jsonapi_id(),
                 relationships: self.build_relationships(),
@@ -60,7 +63,7 @@ pub trait JsonApiModel: Serialize
             };
 
             (resource, self.build_included())
-        }else{
+        } else {
             panic!(format!("{} is not a Value::Object", self.jsonapi_type()))
         }
     }
@@ -70,7 +73,7 @@ pub trait JsonApiModel: Serialize
         let (resource, included) = self.to_jsonapi_resource();
         JsonApiDocument {
             data: Some(PrimaryData::Single(Box::new(resource))),
-            included: included,
+            included,
             ..Default::default()
         }
     }
@@ -108,14 +111,18 @@ pub trait JsonApiModel: Serialize
      * */
     #[doc(hidden)]
     fn extract_attributes(attrs: &Map<String, Value>) -> ResourceAttributes {
-        attrs.iter().filter(|&(key, _)|{
-            if let Some(fields) = Self::relationship_fields(){
-                if fields.contains(&key.as_str()) {
-                    return false;
+        attrs
+            .iter()
+            .filter(|&(key, _)| {
+                if let Some(fields) = Self::relationship_fields() {
+                    if fields.contains(&key.as_str()) {
+                        return false;
+                    }
                 }
-            }
-            true
-        }).map(|(k,v)|{ (k.clone(), v.clone()) }).collect()
+                true
+            })
+            .map(|(k, v)| (k.clone(), v.clone()))
+            .collect()
     }
 
     #[doc(hidden)]
@@ -134,7 +141,7 @@ pub trait JsonApiModel: Serialize
     {
         for resource in haystack {
             if resource._type == needle._type && resource.id == needle.id {
-                return Some(resource)
+                return Some(resource);
             }
         }
         None
@@ -181,8 +188,7 @@ pub trait JsonApiModel: Serialize
 
     #[doc(hidden)]
     fn from_serializable<S: Serialize>(s: S) -> Result<Self> {
-        from_value(to_value(s).unwrap())
-            .chain_err(|| "Error casting via serde_json")
+        from_value(to_value(s).unwrap()).chain_err(|| "Error casting via serde_json")
     }
 }
 
@@ -212,7 +218,7 @@ pub fn vec_to_jsonapi_document<T: JsonApiModel>(objects: Vec<T>) -> JsonApiDocum
     let (resources, included) = vec_to_jsonapi_resources(objects);
     JsonApiDocument {
         data: Some(PrimaryData::Multiple(resources)),
-        included: included,
+        included,
         ..Default::default()
     }
 }
