@@ -41,3 +41,4 @@ using [conventional](https://github.com/conventional-changelog/conventional-chan
 
 The current configuration works for commit messages prefixed with `feat:`, `bug:`, `test:`, `doc:` and `refactor:`.
 
+
