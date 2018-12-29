@@ -22,7 +22,7 @@ fn can_parse() {
     let _ = env_logger::try_init();
     let query = Query::from_params(
         "include=author&fields[articles]=title,\
-                                    body&fields[people]=name&page[number]=3&page[size]=1",
+                                    body&fields[people]=name&sort=name&page[number]=3&page[size]=1",
     );
 
     match query.include {
@@ -65,6 +65,13 @@ fn can_parse() {
         }
     }
 
+    match query.sort {
+        None => assert!(false),
+        Some(sort) => {
+            assert_eq!(sort.len(), 1);
+            assert_eq!(sort[0], "name");
+        }
+    }
 }
 
 #[test]
@@ -88,6 +95,11 @@ fn can_parse_and_provide_defaults_for_missing_values() {
             assert_eq!(page.size, 0);
             assert_eq!(page.number, 0);
         }
+    }
+
+    match query.sort {
+        None => assert!(true),
+        Some(_) => assert!(false),
     }
 }
 
@@ -113,6 +125,11 @@ fn can_parse_and_use_defaults_for_invalid_values() {
             assert_eq!(page.number, 0);
         }
     }
+
+    match query.sort {
+        None => assert!(true),
+        Some(_) => assert!(false)
+    }
 }
 
 #[test]
@@ -134,6 +151,11 @@ fn can_provide_and_empty_struct() {
         None => assert!(false),
         Some(_) => assert!(true),
     }
+
+    match query.sort {
+        None => assert!(true),
+        Some(_) => assert!(false),
+    }
 }
 
 #[test]
@@ -144,6 +166,7 @@ fn can_generate_string_empty() {
         include: None,
         fields: None,
         page: None,
+        sort: None
     };
 
     let query_string = query.to_params();
@@ -159,6 +182,7 @@ fn can_generate_string_include() {
         include: Some(vec!["author".into()]),
         fields: None,
         page: None,
+        sort: None
     };
 
     let query_string = query.to_params();
@@ -174,11 +198,44 @@ fn can_generate_string_include_multiple() {
         include: Some(vec!["author".into(), "publisher".into()]),
         fields: None,
         page: None,
+        sort: None
     };
 
     let query_string = query.to_params();
 
     assert_eq!(query_string, "include=author,publisher");
+}
+
+#[test]
+fn can_generate_string_sort() {
+    let _ = env_logger::try_init();
+    let query = Query {
+        _type: "none".into(),
+        include: None,
+        fields: None,
+        page: None,
+        sort: Some(vec!["name".into()])
+    };
+
+    let query_string = query.to_params();
+
+    assert_eq!(query_string, "sort=name");
+}
+
+#[test]
+fn can_generate_string_sort_multiple() {
+    let _ = env_logger::try_init();
+    let query = Query {
+        _type: "none".into(),
+        include: None,
+        fields: None,
+        page: None,
+        sort: Some(vec!["-name".into(),"created".into()])
+    };
+
+    let query_string = query.to_params();
+
+    assert_eq!(query_string, "sort=-name,created");
 }
 
 #[test]
@@ -194,6 +251,7 @@ fn can_generate_string_fields() {
         include: None,
         fields: Some(fields),
         page: None,
+        sort: None
     };
 
     let query_string = query.to_params();
@@ -214,6 +272,7 @@ fn can_generate_string_fields_multiple_values() {
         include: None,
         fields: Some(fields),
         page: None,
+        sort: None
     };
 
     let query_string = query.to_params();
@@ -235,6 +294,7 @@ fn can_generate_string_fields_multiple_key_and_values() {
         include: None,
         fields: Some(fields),
         page: None,
+        sort: None
     };
 
     let query_string = query.to_params();
@@ -264,6 +324,7 @@ fn can_generate_page_fields() {
             size: 5,
             number: 10,
         }),
+        sort: None
     };
 
     let query_string = query.to_params();
