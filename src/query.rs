@@ -14,6 +14,7 @@ pub struct Query {
     pub include: Option<Vec<String>>,
     pub fields: Option<HashMap<String, Vec<String>>>,
     pub page: Option<PageParams>,
+    pub sort: Option<Vec<String>>,
 }
 
 /// JSON-API Query parameters
@@ -72,6 +73,20 @@ impl Query {
                         error!("Query::from_params : No fields found in {:?}", x);
                     }
                 }
+
+                let sort = match o.pointer("/sort") {
+                    None => None,
+                    Some(sort) => {
+                        match sort.as_str() {
+                            None => None,
+                            Some(sort_str) => {
+                                let arr: Vec<String> =
+                                    sort_str.split(',').map(|s| s.to_string()).collect();
+                                Some(arr)
+                            }
+                        }
+                    }
+                };
 
                 let page = PageParams {
                     number: match o.pointer("/page/number") {
@@ -145,6 +160,7 @@ impl Query {
                     include,
                     fields: Some(fields),
                     page: Some(page),
+                    sort: sort,
                 }
             }
             Err(err) => {
@@ -170,6 +186,7 @@ impl Query {
     ///     size: 5,
     ///     number: 10,
     ///   }),
+    ///   sort: None,
     /// };
     ///
     /// let query_string = query.to_params();
@@ -191,6 +208,10 @@ impl Query {
             for (name, val) in fields.iter() {
                 params.push(format!("fields[{}]={}", name, val.join(",")));
             }
+        }
+
+        if let Some(ref sort) = self.sort {
+            params.push(format!("sort={}", sort.join(",")))
         }
 
         if let Some(ref page) = self.page {
