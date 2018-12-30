@@ -1,4 +1,12 @@
 <a name=""></a>
+##  0.6.1 (2018-12-30)
+
+
+#### Features
+
+*   Support sort query parameters ([b6b1def5](https://github.com/michiel/jsonapi-rust/commit/b6b1def55a769ae9fbbf60915e3ae44111d6b348))
+
+<a name=""></a>
 ##  0.6.0 (2018-02-14)
 
 #### Features
