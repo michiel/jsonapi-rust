@@ -15,6 +15,7 @@ pub struct Query {
     pub fields: Option<HashMap<String, Vec<String>>>,
     pub page: Option<PageParams>,
     pub sort: Option<Vec<String>>,
+    pub filter: Option<HashMap<String, Vec<String>>>
 }
 
 /// JSON-API Query parameters
@@ -84,6 +85,30 @@ impl Query {
                                     sort_str.split(',').map(|s| s.to_string()).collect();
                                 Some(arr)
                             }
+                        }
+                    }
+                };
+
+                let mut filter = match o.pointer("/filter") {
+                    None => None,
+                    Some(x) => {
+                        if x.is_object() {
+                            let mut tmp_filter = HashMap::<String, Vec<String>>::new();
+                            if let Some(obj) = x.as_object() {
+                                for (key, value) in obj.iter() {
+                                    let arr: Vec<String> = match value.as_str() {
+                                        Some(string) => {
+                                            string.split(',').map(|s| s.to_string()).collect()
+                                        }
+                                        None => Vec::<String>::new(),
+                                    };
+                                    tmp_filter.insert(key.to_string(), arr);
+                                }
+                            }
+                            Some(tmp_filter)
+                        } else {
+                            error!("Query::from_params : No filter found in {:?}", x);
+                            None
                         }
                     }
                 };
@@ -161,6 +186,7 @@ impl Query {
                     fields: Some(fields),
                     page: Some(page),
                     sort: sort,
+                    filter: filter,
                 }
             }
             Err(err) => {
@@ -187,6 +213,7 @@ impl Query {
     ///     number: 10,
     ///   }),
     ///   sort: None,
+    ///   filter: None,
     /// };
     ///
     /// let query_string = query.to_params();
@@ -212,6 +239,12 @@ impl Query {
 
         if let Some(ref sort) = self.sort {
             params.push(format!("sort={}", sort.join(",")))
+        }
+
+        if let Some(ref filter) = self.filter {
+            for (name, val) in filter.iter() {
+                params.push(format!("filter[{}]={}", name, val.join(",")));
+            }
         }
 
         if let Some(ref page) = self.page {

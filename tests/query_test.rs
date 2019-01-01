@@ -22,7 +22,7 @@ fn can_parse() {
     let _ = env_logger::try_init();
     let query = Query::from_params(
         "include=author&fields[articles]=title,\
-                                    body&fields[people]=name&sort=name&page[number]=3&page[size]=1",
+                                    body&fields[people]=name&filter[post]=1,2&sort=name&page[number]=3&page[size]=1",
     );
 
     match query.include {
@@ -72,6 +72,22 @@ fn can_parse() {
             assert_eq!(sort[0], "name");
         }
     }
+
+    match query.filter {
+        None => assert!(false),
+        Some(filter) => {
+            assert_eq!(filter.contains_key("post"), true);
+
+            match filter.get("post") {
+                None => assert!(false),
+                Some(arr) => {
+                    assert_eq!(arr.len(), 2);
+                    assert_eq!(arr[0], "1");
+                    assert_eq!(arr[1], "2");
+                }
+            }
+        }
+    }
 }
 
 #[test]
@@ -98,6 +114,11 @@ fn can_parse_and_provide_defaults_for_missing_values() {
     }
 
     match query.sort {
+        None => assert!(true),
+        Some(_) => assert!(false),
+    }
+
+    match query.filter {
         None => assert!(true),
         Some(_) => assert!(false),
     }
@@ -130,6 +151,11 @@ fn can_parse_and_use_defaults_for_invalid_values() {
         None => assert!(true),
         Some(_) => assert!(false)
     }
+
+    match query.filter {
+        None => assert!(true),
+        Some(_) => assert!(false),
+    }
 }
 
 #[test]
@@ -156,6 +182,11 @@ fn can_provide_and_empty_struct() {
         None => assert!(true),
         Some(_) => assert!(false),
     }
+
+    match query.filter {
+        None => assert!(true),
+        Some(_) => assert!(false),
+    }
 }
 
 #[test]
@@ -166,7 +197,8 @@ fn can_generate_string_empty() {
         include: None,
         fields: None,
         page: None,
-        sort: None
+        sort: None,
+        filter: None,
     };
 
     let query_string = query.to_params();
@@ -182,7 +214,8 @@ fn can_generate_string_include() {
         include: Some(vec!["author".into()]),
         fields: None,
         page: None,
-        sort: None
+        sort: None,
+        filter: None,
     };
 
     let query_string = query.to_params();
@@ -198,7 +231,8 @@ fn can_generate_string_include_multiple() {
         include: Some(vec!["author".into(), "publisher".into()]),
         fields: None,
         page: None,
-        sort: None
+        sort: None,
+        filter: None,
     };
 
     let query_string = query.to_params();
@@ -214,7 +248,8 @@ fn can_generate_string_sort() {
         include: None,
         fields: None,
         page: None,
-        sort: Some(vec!["name".into()])
+        sort: Some(vec!["name".into()]),
+        filter: None,
     };
 
     let query_string = query.to_params();
@@ -230,7 +265,8 @@ fn can_generate_string_sort_multiple() {
         include: None,
         fields: None,
         page: None,
-        sort: Some(vec!["-name".into(),"created".into()])
+        sort: Some(vec!["-name".into(),"created".into()]),
+        filter: None,
     };
 
     let query_string = query.to_params();
@@ -251,7 +287,8 @@ fn can_generate_string_fields() {
         include: None,
         fields: Some(fields),
         page: None,
-        sort: None
+        sort: None,
+        filter: None,
     };
 
     let query_string = query.to_params();
@@ -272,7 +309,8 @@ fn can_generate_string_fields_multiple_values() {
         include: None,
         fields: Some(fields),
         page: None,
-        sort: None
+        sort: None,
+        filter: None,
     };
 
     let query_string = query.to_params();
@@ -294,7 +332,8 @@ fn can_generate_string_fields_multiple_key_and_values() {
         include: None,
         fields: Some(fields),
         page: None,
-        sort: None
+        sort: None,
+        filter: None,
     };
 
     let query_string = query.to_params();
@@ -313,6 +352,83 @@ fn can_generate_string_fields_multiple_key_and_values() {
 }
 
 #[test]
+fn can_generate_string_filter() {
+    let _ = env_logger::try_init();
+    type VecOfStrings = Vec<String>;
+    let mut filter = std::collections::HashMap::<String, VecOfStrings>::new();
+
+    filter.insert("posts".into(), vec!["1".into()]);
+
+    let query = Query {
+        _type: "none".into(),
+        include: None,
+        fields: None,
+        page: None,
+        sort: None,
+        filter: Some(filter),
+    };
+
+    let query_string = query.to_params();
+
+    assert_eq!(query_string, "filter[posts]=1");
+}
+
+#[test]
+fn can_generate_string_filter_multiple_values() {
+    let _ = env_logger::try_init();
+    type VecOfStrings = Vec<String>;
+    let mut filter = std::collections::HashMap::<String, VecOfStrings>::new();
+
+    filter.insert("posts".into(), vec!["1".into(), "2".into()]);
+
+    let query = Query {
+        _type: "none".into(),
+        include: None,
+        fields: None,
+        page: None,
+        sort: None,
+        filter: Some(filter),
+    };
+
+    let query_string = query.to_params();
+
+    assert_eq!(query_string, "filter[posts]=1,2");
+}
+
+#[test]
+fn can_generate_string_filter_multiple_key_and_values() {
+    let _ = env_logger::try_init();
+    type VecOfStrings = Vec<String>;
+    let mut filter = std::collections::HashMap::<String, VecOfStrings>::new();
+
+    filter.insert("posts".into(), vec!["1".into(), "2".into()]);
+    filter.insert("authors".into(), vec!["3".into(), "4".into()]);
+
+    let query = Query {
+        _type: "none".into(),
+        include: None,
+        fields: None,
+        page: None,
+        sort: None,
+        filter: Some(filter),
+    };
+
+    let query_string = query.to_params();
+
+    // We don't have any guarantees on the order in which fields are output
+    //
+
+    assert!(
+        query_string.eq(
+            "filter[posts]=1,2&filter[authors]=3,4",
+        ) ||
+            query_string.eq(
+                "filter[authors]=3,4&filter[posts]=1,2",
+            )
+    );
+}
+
+#[test]
 fn can_generate_page_fields() {
     let _ = env_logger::try_init();
 
@@ -324,7 +440,8 @@ fn can_generate_page_fields() {
             size: 5,
             number: 10,
         }),
-        sort: None
+        sort: None,
+        filter: None,
     };
 
     let query_string = query.to_params();
