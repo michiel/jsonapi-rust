@@ -3,6 +3,7 @@ extern crate jsonapi;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
+use jsonapi::array::JsonApiArray;
 use jsonapi::model::*;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
