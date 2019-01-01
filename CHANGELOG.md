@@ -1,6 +1,12 @@
 <a name=""></a>
-##  0.6.1 (2018-12-30)
+## 0.6.2 (2019-01-01)
 
+#### Features
+
+*   Add support for filter query param ([664fb91b](https://github.com/michiel/jsonapi-rust/commit/664fb91bf285c9770d180bf40e5ac84a525d4684))
+
+<a name=""></a>
+##  0.6.1 (2018-12-30)
 
 #### Features
 
