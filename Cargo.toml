@@ -23,4 +23,4 @@ error-chain = "^0.12.0"
 env_logger = "0.6"
 
 [badges]
-travis-ci = { repository = "https://travis-ci.org/michiel/jsonapi-rust/", branch = "master" }
+travis-ci = { repository = "michiel/jsonapi-rust", branch = "master" }
