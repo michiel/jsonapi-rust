@@ -215,6 +215,28 @@ pub fn vec_to_jsonapi_document<T: JsonApiModel>(objects: Vec<T>) -> JsonApiDocum
     }
 }
 
+impl<M: JsonApiModel> JsonApiModel for Box<M> {
+    fn jsonapi_type(&self) -> String {
+        self.as_ref().jsonapi_type()
+    }
+
+    fn jsonapi_id(&self) -> String {
+        self.as_ref().jsonapi_id()
+    }
+
+    fn relationship_fields() -> Option<&'static [&'static str]> {
+        M::relationship_fields()
+    }
+
+    fn build_relationships(&self) -> Option<Relationships> {
+        self.as_ref().build_relationships()
+    }
+
+    fn build_included(&self) -> Option<Resources> {
+        self.as_ref().build_included()
+    }
+}
+
 #[macro_export]
 macro_rules! jsonapi_model {
     ($model:ty; $type:expr) => (
@@ -252,7 +274,7 @@ macro_rules! jsonapi_model {
 
                 Some(FIELDS)
             }
-            
+
             fn build_relationships(&self) -> Option<Relationships> {
                 let mut relationships = HashMap::new();
                 $(
@@ -267,7 +289,7 @@ macro_rules! jsonapi_model {
                 )*
                 Some(relationships)
             }
-            
+
             fn build_included(&self) -> Option<Resources> {
                 let mut included:Resources = vec![];
                 $( included.append(&mut self.$has_one.to_resources()); )*
