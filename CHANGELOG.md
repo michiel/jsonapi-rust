@@ -1,4 +1,13 @@
 <a name=""></a>
+## 0.6.3 (2019-01-02)
+
+#### Features
+
+*   Derive Clone for Query ([99ff203](https://github.com/michiel/jsonapi-rust/commit/99ff203e97497a09dfc60f40c0daa895714c147f))
+*   Enable support for "maybe has many" ([6dc6b41](https://github.com/michiel/jsonapi-rust/commit/6dc6b4152cff84e1f1a1d4e065520dc659415694))
+*   Derive JsonApiModel for Box<M> where M: JsonApiModel ([a261447](https://github.com/michiel/jsonapi-rust/commit/a261447cc6eb54f2c20a43be2ac7d71e70950ea6))
+
+<a name=""></a>
 ## 0.6.2 (2019-01-01)
 
 #### Features
