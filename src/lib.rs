@@ -28,6 +28,7 @@ extern crate log;
 extern crate error_chain;
 
 pub mod api;
+pub mod array;
 pub mod query;
 pub mod model;
 pub mod errors;

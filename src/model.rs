@@ -1,5 +1,6 @@
 pub use std::collections::HashMap;
 pub use api::*;
+use array::JsonApiArray;
 use errors::*;
 use serde::{Deserialize, Serialize};
 use serde_json::{from_value, to_value, Value, Map};
@@ -283,8 +284,12 @@ macro_rules! jsonapi_model {
                     );
                 )*
                 $(
-                    relationships.insert(stringify!($has_many).into(),
-                        Self::build_has_many(&self.$has_many)
+                    relationships.insert(
+                        stringify!($has_many).into(),
+                        {
+                            let values = &self.$has_many.get_models();
+                            Self::build_has_many(values)
+                        }
                     );
                 )*
                 Some(relationships)
@@ -294,7 +299,7 @@ macro_rules! jsonapi_model {
                 let mut included:Resources = vec![];
                 $( included.append(&mut self.$has_one.to_resources()); )*
                 $(
-                    for model in &self.$has_many {
+                    for model in self.$has_many.get_models() {
                         included.append(&mut model.to_resources());
                     }
                 )*
