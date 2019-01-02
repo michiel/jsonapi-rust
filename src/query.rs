@@ -8,7 +8,7 @@ pub struct PageParams {
 }
 
 /// JSON-API Query parameters
-#[derive(Debug, PartialEq, Default)]
+#[derive(Clone, Debug, PartialEq, Default)]
 pub struct Query {
     pub _type: String,
     pub include: Option<Vec<String>>,
