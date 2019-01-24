@@ -163,7 +163,7 @@ impl PatchSet {
         }
     }
 
-    pub fn push(&mut self, patch: Patch) -> () {
+    pub fn push(&mut self, patch: Patch) {
         self.patches.push(patch);
     }
 }
@@ -200,10 +200,7 @@ impl JsonApiDocument {
     /// assert_eq!(doc.is_valid(), false);
     /// ```
     pub fn is_valid(&self) -> bool {
-        match self.validate() {
-            Some(_) => false,
-            None => true,
-        }
+        self.validate().is_none()
     }
 
     /// This function returns a `Vec` with identified specification violations enumerated in
