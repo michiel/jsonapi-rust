@@ -185,8 +185,8 @@ impl Query {
                     include,
                     fields: Some(fields),
                     page: Some(page),
-                    sort: sort,
-                    filter: filter,
+                    sort,
+                    filter,
                 }
             }
             Err(err) => {
