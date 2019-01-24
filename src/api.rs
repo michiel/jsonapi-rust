@@ -1,6 +1,6 @@
 use serde_json;
 use std::collections::HashMap;
-use errors::*;
+use crate::errors::*;
 use std::str::FromStr;
 use std;
 

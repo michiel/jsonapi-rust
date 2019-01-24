@@ -1,7 +1,7 @@
 pub use std::collections::HashMap;
-pub use api::*;
-use array::JsonApiArray;
-use errors::*;
+pub use crate::api::*;
+use crate::array::JsonApiArray;
+use crate::errors::*;
 use serde::{Deserialize, Serialize};
 use serde_json::{from_value, to_value, Value, Map};
 

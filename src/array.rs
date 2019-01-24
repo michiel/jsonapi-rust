@@ -1,4 +1,4 @@
-use model::JsonApiModel;
+use crate::model::JsonApiModel;
 
 /// Trait which allows a `has many` relationship to be optional.
 pub trait JsonApiArray<M> {

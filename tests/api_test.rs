@@ -5,7 +5,7 @@ extern crate env_logger;
 use jsonapi::api::*;
 
 mod helper;
-use helper::read_json_file;
+use crate::helper::read_json_file;
 
 #[test]
 fn it_works() {
@@ -243,7 +243,7 @@ fn multiple_data_document_from_json_string() {
 fn api_document_from_json_file() {
     let _ = env_logger::try_init();
 
-    let s = ::read_json_file("data/results.json");
+    let s = crate::read_json_file("data/results.json");
     let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&s);
 
     match data {
@@ -277,7 +277,7 @@ fn api_document_from_json_file() {
 fn api_document_collection_from_json_file() {
     let _ = env_logger::try_init();
 
-    let s = ::read_json_file("data/collection.json");
+    let s = crate::read_json_file("data/collection.json");
     let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&s);
 
     match data {
@@ -341,7 +341,7 @@ fn api_document_collection_from_json_file() {
 #[test]
 fn can_deserialize_jsonapi_example_resource_001() {
     let _ = env_logger::try_init();
-    let s = ::read_json_file("data/resource_001.json");
+    let s = crate::read_json_file("data/resource_001.json");
     let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
@@ -349,7 +349,7 @@ fn can_deserialize_jsonapi_example_resource_001() {
 #[test]
 fn can_deserialize_jsonapi_example_resource_002() {
     let _ = env_logger::try_init();
-    let s = ::read_json_file("data/resource_002.json");
+    let s = crate::read_json_file("data/resource_002.json");
     let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
@@ -357,7 +357,7 @@ fn can_deserialize_jsonapi_example_resource_002() {
 #[test]
 fn can_deserialize_jsonapi_example_resource_003() {
     let _ = env_logger::try_init();
-    let s = ::read_json_file("data/resource_003.json");
+    let s = crate::read_json_file("data/resource_003.json");
     let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
@@ -365,7 +365,7 @@ fn can_deserialize_jsonapi_example_resource_003() {
 #[test]
 fn can_deserialize_jsonapi_example_compound_document() {
     let _ = env_logger::try_init();
-    let s = ::read_json_file("data/compound_document.json");
+    let s = crate::read_json_file("data/compound_document.json");
     let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
@@ -373,7 +373,7 @@ fn can_deserialize_jsonapi_example_compound_document() {
 #[test]
 fn can_deserialize_jsonapi_example_links_001() {
     let _ = env_logger::try_init();
-    let s = ::read_json_file("data/links_001.json");
+    let s = crate::read_json_file("data/links_001.json");
     let data: Result<Links, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
@@ -381,7 +381,7 @@ fn can_deserialize_jsonapi_example_links_001() {
 #[test]
 fn can_deserialize_jsonapi_example_links_002() {
     let _ = env_logger::try_init();
-    let s = ::read_json_file("data/links_002.json");
+    let s = crate::read_json_file("data/links_002.json");
     let data: Result<Links, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
@@ -389,7 +389,7 @@ fn can_deserialize_jsonapi_example_links_002() {
 #[test]
 fn can_deserialize_jsonapi_example_jsonapi_info() {
     let _ = env_logger::try_init();
-    let s = ::read_json_file("data/jsonapi_info_001.json");
+    let s = crate::read_json_file("data/jsonapi_info_001.json");
     let data: Result<JsonApiInfo, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
@@ -397,7 +397,7 @@ fn can_deserialize_jsonapi_example_jsonapi_info() {
 #[test]
 fn can_get_attribute() {
     let _ = env_logger::try_init();
-    let s = ::read_json_file("data/resource_all_attributes.json");
+    let s = crate::read_json_file("data/resource_all_attributes.json");
     let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
     match data {
         Err(_) => assert!(false),
@@ -459,8 +459,8 @@ fn can_get_attribute() {
 #[test]
 fn can_diff_resource() {
     let _ = env_logger::try_init();
-    let s1 = ::read_json_file("data/resource_post_001.json");
-    let s2 = ::read_json_file("data/resource_post_002.json");
+    let s1 = crate::read_json_file("data/resource_post_001.json");
+    let s2 = crate::read_json_file("data/resource_post_002.json");
 
     let data1: Result<Resource, serde_json::Error> = serde_json::from_str(&s1);
     let data2: Result<Resource, serde_json::Error> = serde_json::from_str(&s2);
