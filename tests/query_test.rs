@@ -91,7 +91,7 @@ fn can_parse() {
 }
 
 #[test]
-fn can_parse_and_provide_defaults_for_missing_values() {
+fn can_parse_and_provide_defaults_for_partial_fields() {
     let _ = env_logger::try_init();
     let query = Query::from_params("");
 
@@ -121,6 +121,111 @@ fn can_parse_and_provide_defaults_for_missing_values() {
     match query.filter {
         None => assert!(true),
         Some(_) => assert!(false),
+    }
+}
+
+#[test]
+fn can_parse_and_handle_missing_fields_values() {
+    let _ = env_logger::try_init();
+
+    let query = Query::from_params("fields=");
+    match query.fields {
+        None => assert!(false),
+        Some(_) => assert!(true),
+    }
+
+    let query = Query::from_params("fields=key");
+    match query.fields {
+        None => assert!(false),
+        Some(_) => assert!(true),
+    }
+
+    let query = Query::from_params("fields=[key]");
+    match query.fields {
+        None => assert!(false),
+        Some(_) => assert!(true),
+    }
+
+    let query = Query::from_params("fields[key]");
+    match query.fields {
+        None => assert!(false),
+        Some(_) => assert!(true),
+    }
+
+    let query = Query::from_params("fields[key]=");
+    match query.fields {
+        None => assert!(false),
+        Some(_) => assert!(true),
+    }
+}
+
+#[test]
+fn can_parse_and_handle_missing_filter_values() {
+    let _ = env_logger::try_init();
+
+    let query = Query::from_params("filter=");
+    match query.filter {
+        None => assert!(true),
+        Some(_) => assert!(false),
+    }
+
+    let query = Query::from_params("filter=key");
+    match query.filter {
+        None => assert!(true),
+        Some(_) => assert!(false),
+    }
+
+    let query = Query::from_params("filter=[key]");
+    match query.filter {
+        None => assert!(true),
+        Some(_) => assert!(false),
+    }
+
+    let query = Query::from_params("filter[key]");
+    match query.filter {
+        None => assert!(false),
+        Some(_) => assert!(true),
+    }
+
+    let query = Query::from_params("filter[key]=");
+    match query.filter {
+        None => assert!(false),
+        Some(_) => assert!(true),
+    }
+}
+
+#[test]
+fn can_parse_and_handle_missing_page_values() {
+    let _ = env_logger::try_init();
+
+    let query = Query::from_params("page=&");
+
+    match query.page {
+        None => assert!(false),
+        Some(pageparams) => {
+            assert_eq!(pageparams.number, 0);
+            assert_eq!(pageparams.size, 0);
+        }
+    }
+
+    let query = Query::from_params("page[number]=&page[size]=");
+
+    match query.page {
+        None => assert!(false),
+        Some(pageparams) => {
+            assert_eq!(pageparams.number, 0);
+            assert_eq!(pageparams.size, 0);
+        }
+    }
+
+    let query = Query::from_params("page[number]=/&page[size]=/");
+
+    match query.page {
+        None => assert!(false),
+        Some(pageparams) => {
+            assert_eq!(pageparams.number, 0);
+            assert_eq!(pageparams.size, 0);
+        }
     }
 }
 

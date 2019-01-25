@@ -57,7 +57,7 @@ fn ok_params_fields(o:&Value) -> HashMap<String, Vec<String>> {
                 }
             }
         } else {
-            error!("Query::from_params : No fields found in {:?}", x);
+            warn!("Query::from_params : No fields found in {:?}", x);
         }
     }
 
@@ -99,7 +99,7 @@ fn ok_params_filter(o:&Value) -> Option<HashMap<String, Vec<String>>> {
                 }
                 Some(tmp_filter)
             } else {
-                error!("Query::from_params : No filter found in {:?}", x);
+                warn!("Query::from_params : No filter found in {:?}", x);
                 None
             }
         }
@@ -211,7 +211,7 @@ impl Query {
                 ok_params(o)
             }
             Err(err) => {
-                error!("Query::from_params : Can't parse : {:?}", err);
+                warn!("Query::from_params : Can't parse : {:?}", err);
                 Query {
                     _type: "none".into(),
                     ..Default::default()
