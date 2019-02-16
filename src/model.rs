@@ -181,7 +181,7 @@ where
 
     #[doc(hidden)]
     fn from_serializable<S: Serialize>(s: S) -> Result<Self> {
-        from_value(to_value(s).unwrap()).chain_err(|| "Error casting via serde_json")
+        from_value(to_value(s)?).map_err(Error::from)
     }
 }
 
