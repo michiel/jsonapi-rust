@@ -1,6 +1,6 @@
 [package]
 name = "jsonapi"
-version = "0.6.3"
+version = "0.6.4"
 authors = ["Michiel Kalkman <michiel@nosuchtype.com>"]
 description = "JSONAPI implementation"
 documentation = "https://docs.rs/jsonapi"

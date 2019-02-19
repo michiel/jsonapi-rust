@@ -1,4 +1,11 @@
 <a name=""></a>
+## 0.6.4 (2019-02-19)
+
+#### Features
+
+* Don't suppress errors of serde_json ([3b70f04](https://github.com/michiel/jsonapi-rust/commit/3b70f04e82e3ffab72859157819d06147b07ab09))
+
+<a name=""></a>
 ## 0.6.3 (2019-01-02)
 
 #### Features
