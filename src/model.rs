@@ -1,6 +1,5 @@
 pub use std::collections::HashMap;
 pub use crate::api::*;
-use crate::array::JsonApiArray;
 use crate::errors::*;
 use serde::{Deserialize, Serialize};
 use serde_json::{from_value, to_value, Value, Map};
@@ -308,18 +307,3 @@ macro_rules! jsonapi_model {
         }
     );
 }
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Dog {
-    id: String,
-    name: String,
-    age: i32,
-    main_flea: Flea,
-    fleas: Vec<Flea>,
-}
-jsonapi_model!(Dog; "dog"; has one main_flea; has many fleas);
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Flea {
-    id: String,
-    name: String,
-}
-jsonapi_model!(Flea; "flea");
