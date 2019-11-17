@@ -364,7 +364,7 @@ fn can_deserialize_jsonapi_example_resource_003() {
 
 #[test]
 fn can_deserialize_jsonapi_example_resource_004() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let s = ::read_json_file("data/resource_004.json");
     let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
