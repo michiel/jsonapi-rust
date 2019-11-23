@@ -23,7 +23,10 @@ where
     #[doc(hidden)]
     fn build_included(&self) -> Option<Resources>;
 
-    fn from_jsonapi_resource(resource: &Resource, included: &Option<Resources>) -> Result<Self> {
+    fn from_jsonapi_resource(resource: &Resource, included: &Option<Resources>)
+        -> Result<Self>
+    {
+
         Self::from_serializable(Self::resource_to_attrs(resource, included))
     }
 
@@ -79,18 +82,18 @@ where
     #[doc(hidden)]
     fn build_has_one<M: JsonApiModel>(model: &M) -> Relationship {
         Relationship {
-            data: IdentifierData::Single(model.as_resource_identifier()),
-            links: None,
+            data: Some(IdentifierData::Single(model.as_resource_identifier())),
+            links: None
         }
     }
 
     #[doc(hidden)]
     fn build_has_many<M: JsonApiModel>(models: &[M]) -> Relationship {
         Relationship {
-            data: IdentifierData::Multiple(
-                models.iter().map(|m| m.as_resource_identifier()).collect(),
-            ),
-            links: None,
+            data: Some(IdentifierData::Multiple(
+                models.iter().map(|m| m.as_resource_identifier()).collect()
+            )),
+            links: None
         }
     }
 
@@ -133,7 +136,9 @@ where
     }
 
     #[doc(hidden)]
-    fn lookup<'a>(needle: &ResourceIdentifier, haystack: &'a [Resource]) -> Option<&'a Resource> {
+    fn lookup<'a>(needle: &ResourceIdentifier, haystack: &'a [Resource])
+        -> Option<&'a Resource>
+    {
         for resource in haystack {
             if resource._type == needle._type && resource.id == needle.id {
                 return Some(resource);
@@ -143,7 +148,9 @@ where
     }
 
     #[doc(hidden)]
-    fn resource_to_attrs(resource: &Resource, included: &Option<Resources>) -> ResourceAttributes {
+    fn resource_to_attrs(resource: &Resource, included: &Option<Resources>)
+        -> ResourceAttributes
+    {
         let mut new_attrs = HashMap::new();
         new_attrs.clone_from(&resource.attributes);
         new_attrs.insert("id".into(), resource.id.clone().into());
@@ -151,25 +158,26 @@ where
         if let Some(relations) = resource.relationships.as_ref() {
             if let Some(inc) = included.as_ref() {
                 for (name, relation) in relations {
-                    let value =
-                        match relation.data {
-                            IdentifierData::None => Value::Null,
-                            IdentifierData::Single(ref identifier) => {
-                                let found = Self::lookup(identifier, inc).map(|r| {
-                                    Self::resource_to_attrs(r, included)
-                                });
-                                to_value(found).expect("Casting Single relation to value")
-                            }
-                            IdentifierData::Multiple(ref identifiers) => {
-                                let found: Vec<Option<ResourceAttributes>> =
+                    let value = match relation.data {
+                        Some(IdentifierData::None) => Value::Null,
+                        Some(IdentifierData::Single(ref identifier)) => {
+                            let found = Self::lookup(identifier, inc)
+                                .map(|r| Self::resource_to_attrs(r, included) );
+                            to_value(found)
+                                .expect("Casting Single relation to value")
+                        },
+                        Some(IdentifierData::Multiple(ref identifiers)) => {
+                            let found: Vec<Option<ResourceAttributes>> =
                                 identifiers.iter().map(|id|{
                                     Self::lookup(id, inc).map(|r|{
                                         Self::resource_to_attrs(r, included)
                                     })
                                 }).collect();
-                                to_value(found).expect("Casting Multiple relation to value")
-                            }
-                        };
+                            to_value(found)
+                                .expect("Casting Multiple relation to value")
+                        },
+                        None => Value::Null,
+                    };
                     new_attrs.insert(name.to_string(), value);
                 }
             }

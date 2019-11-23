@@ -53,7 +53,8 @@ pub struct Resource {
 /// Relationship with another object
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Relationship {
-    pub data: IdentifierData,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub data: Option<IdentifierData>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub links: Option<Links>,
 }
@@ -431,17 +432,19 @@ impl FromStr for Resource {
 impl Relationship {
     pub fn as_id(&self) -> std::result::Result<Option<&JsonApiId>, RelationshipAssumptionError> {
         match self.data {
-            IdentifierData::None => Ok(None),
-            IdentifierData::Multiple(_) => Err(RelationshipAssumptionError::RelationshipIsAList),
-            IdentifierData::Single(ref data) => Ok(Some(&data.id)),
+            Some(IdentifierData::None) => Ok(None),
+            Some(IdentifierData::Multiple(_)) => Err(RelationshipAssumptionError::RelationshipIsAList),
+            Some(IdentifierData::Single(ref data)) => Ok(Some(&data.id)),
+            None => Ok(None),
         }
     }
 
     pub fn as_ids(&self) -> std::result::Result<Option<JsonApiIds>, RelationshipAssumptionError> {
         match self.data {
-            IdentifierData::None => Ok(None),
-            IdentifierData::Single(_) => Err(RelationshipAssumptionError::RelationshipIsNotAList),
-            IdentifierData::Multiple(ref data) => Ok(Some(data.iter().map(|x| &x.id).collect())),
+            Some(IdentifierData::None) => Ok(None),
+            Some(IdentifierData::Single(_)) => Err(RelationshipAssumptionError::RelationshipIsNotAList),
+            Some(IdentifierData::Multiple(ref data)) => Ok(Some(data.iter().map(|x| &x.id).collect())),
+            None => Ok(None),
         }
     }
 }
