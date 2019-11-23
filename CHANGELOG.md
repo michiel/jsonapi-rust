@@ -1,11 +1,18 @@
-<a name=""></a>
+<a name="0.6.5"></a>
+## 0.6.5 (2019-11-23)
+
+#### Bugfixes
+
+*   make Relationship data an Option<IdentifierData> ([b1a91099](https://github.com/michiel/jsonapi-rust/commit/b1a91099380d818c16d6c8806996a6557fbadf59))
+
+<a name="0.6.4"></a>
 ## 0.6.4 (2019-02-19)
 
 #### Features
 
 * Don't suppress errors of serde_json ([3b70f04](https://github.com/michiel/jsonapi-rust/commit/3b70f04e82e3ffab72859157819d06147b07ab09))
 
-<a name=""></a>
+<a name="0.6.3"></a>
 ## 0.6.3 (2019-01-02)
 
 #### Features
@@ -14,21 +21,21 @@
 *   Enable support for "maybe has many" ([6dc6b41](https://github.com/michiel/jsonapi-rust/commit/6dc6b4152cff84e1f1a1d4e065520dc659415694))
 *   Derive JsonApiModel for Box<M> where M: JsonApiModel ([a261447](https://github.com/michiel/jsonapi-rust/commit/a261447cc6eb54f2c20a43be2ac7d71e70950ea6))
 
-<a name=""></a>
+<a name="0.6.2"></a>
 ## 0.6.2 (2019-01-01)
 
 #### Features
 
 *   Add support for filter query param ([664fb91b](https://github.com/michiel/jsonapi-rust/commit/664fb91bf285c9770d180bf40e5ac84a525d4684))
 
-<a name=""></a>
+<a name="0.6.1"></a>
 ##  0.6.1 (2018-12-30)
 
 #### Features
 
 *   Support sort query parameters ([b6b1def5](https://github.com/michiel/jsonapi-rust/commit/b6b1def55a769ae9fbbf60915e3ae44111d6b348))
 
-<a name=""></a>
+<a name="0.6.0"></a>
 ##  0.6.0 (2018-02-14)
 
 #### Features
@@ -37,7 +44,7 @@
 *   Support numeric id in JsonApiModel::to_jsonapi_* ([1f98c88](https://github.com/michiel/jsonapi-rust/commit/1f98c884b80f6d02f28df6d58686908c9068a585))
 
 
-<a name=""></a>
+<a name="0.5.3"></a>
 ##  0.5.3 (2017-12-20)
 
 #### Features
@@ -54,7 +61,7 @@
 *   fix issues with static slice reference on stable ([647f93a](https://github.com/michiel/jsonapi-rust/commit/647f93a0425eff446c10e644ecfc19f957375ecc))
 
 
-<a name=""></a>
+<a name="0.5.1"></a>
 ##  0.5.1 (2017-04-13)
 
 #### Bugfixes
@@ -62,7 +69,7 @@
 *   Not to include data and errors in a same document ([71e65a8](https://github.com/michiel/jsonapi-rust/commit/71e65a8822235e359029c32af51a23bc911fb37d))
 
 
-<a name=""></a>
+<a name="0.5.0"></a>
 ## 0.5.0  (2017-04-08)
 
 
@@ -83,7 +90,7 @@
 
 
 
-<a name=""></a>
+<a name="0.4.0"></a>
 ##  0.4.0 (2017-03-05)
 
 
@@ -96,7 +103,7 @@
 
 
 
-<a name=""></a>
+<a name="0.3.0"></a>
 ##  0.3.0 (2017-02-28)
 
 
@@ -108,7 +115,7 @@
 
 
 
-<a name=""></a>
+<a name="0.2.0"></a>
 ##  0.2.0 (2017-02-23)
 
 #### Features
