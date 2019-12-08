@@ -1,7 +1,6 @@
 # jsonapi-rust
 
 [![Build Status](https://travis-ci.org/michiel/jsonapi-rust.svg?branch=master)](https://travis-ci.org/michiel/jsonapi-rust)
-[![codecov](https://codecov.io/gh/michiel/jsonapi-rust/branch/master/graph/badge.svg)](https://codecov.io/gh/michiel/jsonapi-rust)
 [![Crates.io Status](http://meritbadge.herokuapp.com/jsonapi)](https://crates.io/crates/jsonapi)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/michiel/jsonapi-rust/master/LICENSE)
 [![Documentation](https://docs.rs/jsonapi/badge.svg)](https://docs.rs/jsonapi)
