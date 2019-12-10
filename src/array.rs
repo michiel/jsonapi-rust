@@ -1,3 +1,4 @@
+//! Defines trait and implementations that allow a `has many` relationship to be optional
 use crate::model::JsonApiModel;
 
 /// Trait which allows a `has many` relationship to be optional.

@@ -1,3 +1,5 @@
+//! Defines custom types and structs primarily that composite the JSON:API
+//! document
 use serde_json;
 use std::collections::HashMap;
 use crate::errors::*;
@@ -123,7 +125,8 @@ pub struct JsonApiError {
     pub meta: Option<Meta>,
 }
 
-/// Optional `JsonApiDocument` payload identifying the JSON-API version the server implements
+/// Optional `JsonApiDocument` payload identifying the JSON-API version the
+/// server implements
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct JsonApiInfo {
     pub version: Option<String>,

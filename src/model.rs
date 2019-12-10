@@ -1,11 +1,17 @@
+//! Defines the `JsonApiModel` trait. This is primarily used in conjunction with
+//! the [`jsonapi_model!`](../macro.jsonapi_model.html) macro to allow arbitrary
+//! structs which implement `Deserialize` to be converted to/from a
+//! [`JsonApiDocument`](../api/struct.JsonApiDocument.html) or
+//! [`Resource`](../api/struct.Resource.html)
 pub use std::collections::HashMap;
 pub use crate::api::*;
 use crate::errors::*;
 use serde::{Deserialize, Serialize};
 use serde_json::{from_value, to_value, Value, Map};
 
-/// A trait for any struct that can be converted from/into a Resource.
-/// The only requirement is that your struct has an 'id: String' field.
+/// A trait for any struct that can be converted from/into a
+/// [`Resource`](api/struct.Resource.tml). The only requirement is that your
+/// struct has an `id: String` field.
 /// You shouldn't be implementing JsonApiModel manually, look at the
 /// `jsonapi_model!` macro instead.
 pub trait JsonApiModel: Serialize
@@ -192,6 +198,9 @@ where
     }
 }
 
+/// Converts a `vec!` of structs into
+/// [`Resources`](../api/type.Resources.html)
+///
 pub fn vec_to_jsonapi_resources<T: JsonApiModel>(
     objects: Vec<T>,
 ) -> (Resources, Option<Resources>) {
@@ -214,6 +223,36 @@ pub fn vec_to_jsonapi_resources<T: JsonApiModel>(
     (resources, opt_included)
 }
 
+/// Converts a `vec!` of structs into a
+/// [`JsonApiDocument`](../api/struct.JsonApiDocument.html)
+///
+/// ```rust
+/// #[macro_use] extern crate serde_derive;
+/// #[macro_use] extern crate jsonapi;
+/// use jsonapi::api::*;
+/// use jsonapi::model::*;
+///
+/// #[derive(Debug, PartialEq, Serialize, Deserialize)]
+/// struct Flea {
+///     id: String,
+///     name: String,
+/// }
+///
+/// jsonapi_model!(Flea; "flea");
+///
+/// let fleas = vec![
+///     Flea {
+///         id: "2".into(),
+///         name: "rick".into(),
+///     },
+///     Flea {
+///         id: "3".into(),
+///         name: "morty".into(),
+///     },
+/// ];
+/// let doc = vec_to_jsonapi_document(fleas);
+/// assert!(doc.is_valid());
+/// ```
 pub fn vec_to_jsonapi_document<T: JsonApiModel>(objects: Vec<T>) -> JsonApiDocument {
     let (resources, included) = vec_to_jsonapi_resources(objects);
     JsonApiDocument {
@@ -245,6 +284,9 @@ impl<M: JsonApiModel> JsonApiModel for Box<M> {
     }
 }
 
+/// When applied this macro implements the
+/// [`JsonApiModel`](model/trait.JsonApiModel.html) trait for the provided type
+///
 #[macro_export]
 macro_rules! jsonapi_model {
     ($model:ty; $type:expr) => (
