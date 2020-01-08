@@ -1,3 +1,7 @@
 target
 Cargo.lock
 *.racertmp
+src/*.bk
+tests/*.bk
+*.swp
+*.swo

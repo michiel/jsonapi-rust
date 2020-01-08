@@ -1,6 +1,9 @@
-#[macro_use] extern crate jsonapi;
-#[macro_use] extern crate serde_derive;
+#[macro_use]
+extern crate jsonapi;
+#[macro_use]
+extern crate serde_derive;
 extern crate serde_json;
+use jsonapi::array::JsonApiArray;
 use jsonapi::model::*;
 
 mod helper;
@@ -46,7 +49,6 @@ fn to_jsonapi_document_and_back() {
 
     let doc = book.to_jsonapi_document();
     let json = serde_json::to_string(&doc).unwrap();
-
     let book_doc: JsonApiDocument = serde_json::from_str(&json)
         .expect("Book JsonApiDocument should be created from the book json");
     let book_again = Book::from_jsonapi_document(&book_doc)

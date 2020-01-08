@@ -5,11 +5,11 @@ extern crate env_logger;
 use jsonapi::api::*;
 
 mod helper;
-use helper::read_json_file;
+use crate::helper::read_json_file;
 
 #[test]
 fn it_works() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let resource = Resource {
         _type: "test".into(),
         id: "123".into(),
@@ -63,7 +63,7 @@ fn the_members_data_and_errors_must_not_coexist() {
 
 #[test]
 fn jsonapi_document_can_be_valid() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let resource = Resource {
         _type: "test".into(),
         id: "123".into(),
@@ -93,7 +93,7 @@ fn jsonapi_document_can_be_valid() {
 
 #[test]
 fn jsonapi_document_invalid_errors() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
 
     let resource = Resource {
         _type: "test".into(),
@@ -115,7 +115,7 @@ fn jsonapi_document_invalid_errors() {
 
     let errors = JsonApiErrors::new();
 
-    let no_content_document : JsonApiDocument = Default::default();
+    let no_content_document: JsonApiDocument = Default::default();
 
     match no_content_document.validate() {
         None => assert!(false),
@@ -155,14 +155,16 @@ fn jsonapi_document_invalid_errors() {
     match included_without_data_document.validate() {
         None => assert!(false),
         Some(errors) => {
-            assert!(errors.contains(&DocumentValidationError::IncludedWithoutData));
+            assert!(errors.contains(
+                &DocumentValidationError::IncludedWithoutData,
+            ));
         }
     }
 }
 
 #[test]
 fn error_from_json_string() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
 
     let serialized = r#"
         {"id":"1", "links" : {}, "status" : "unknown", "code" : "code1", "title" : "error-title", "detail": "error-detail"}
@@ -182,7 +184,7 @@ fn error_from_json_string() {
 
 #[test]
 fn single_resource_from_json_string() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let serialized =
         r#"{ "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} }"#;
     let data: Result<Resource, serde_json::Error> = serde_json::from_str(serialized);
@@ -191,7 +193,7 @@ fn single_resource_from_json_string() {
 
 #[test]
 fn multiple_resource_from_json_string() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let serialized = r#"[
             { "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} },
             { "id" :"2", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} },
@@ -203,7 +205,7 @@ fn multiple_resource_from_json_string() {
 
 #[test]
 fn no_data_document_from_json_string() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let serialized = r#"{
             "data" : null
         }"#;
@@ -213,7 +215,7 @@ fn no_data_document_from_json_string() {
 
 #[test]
 fn single_data_document_from_json_string() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let serialized = r#"{
             "data" : {
                 "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {}
@@ -225,7 +227,7 @@ fn single_data_document_from_json_string() {
 
 #[test]
 fn multiple_data_document_from_json_string() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let serialized = r#"{
             "data" : [
                 { "id" :"1", "type" : "post", "attributes" : {}, "relationships" : {}, "links" : {} },
@@ -239,9 +241,9 @@ fn multiple_data_document_from_json_string() {
 
 #[test]
 fn api_document_from_json_file() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
 
-    let s = ::read_json_file("data/results.json");
+    let s = crate::read_json_file("data/results.json");
     let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&s);
 
     match data {
@@ -251,8 +253,10 @@ fn api_document_from_json_file() {
                     assert_eq!(arr.len(), 1);
                 }
                 Some(PrimaryData::Single(_)) => {
-                    println!("api_document_from_json_file : Expected one Resource in a vector, \
-                              not a direct Resource");
+                    println!(
+                        "api_document_from_json_file : Expected one Resource in a vector, \
+                              not a direct Resource"
+                    );
                     assert!(false);
                 }
                 Some(PrimaryData::None) => {
@@ -271,9 +275,9 @@ fn api_document_from_json_file() {
 
 #[test]
 fn api_document_collection_from_json_file() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
 
-    let s = ::read_json_file("data/collection.json");
+    let s = crate::read_json_file("data/collection.json");
     let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&s);
 
     match data {
@@ -284,13 +288,17 @@ fn api_document_collection_from_json_file() {
                     assert_eq!(arr.len(), 1);
                 }
                 Some(PrimaryData::Single(_)) => {
-                    println!("api_document_collection_from_json_file : Expected one Resource in \
-                              a vector, not a direct Resource");
+                    println!(
+                        "api_document_collection_from_json_file : Expected one Resource in \
+                              a vector, not a direct Resource"
+                    );
                     assert!(false);
                 }
                 Some(PrimaryData::None) => {
-                    println!("api_document_collection_from_json_file : Expected one Resource in \
-                              a vector");
+                    println!(
+                        "api_document_collection_from_json_file : Expected one Resource in \
+                              a vector"
+                    );
                     assert!(false);
                 }
                 None => assert!(false),
@@ -304,8 +312,10 @@ fn api_document_collection_from_json_file() {
                     assert_eq!(arr[2].id, "12");
                 }
                 None => {
-                    println!("api_document_collection_from_json_file : Expected three Resources \
-                              in 'included' in a vector");
+                    println!(
+                        "api_document_collection_from_json_file : Expected three Resources \
+                              in 'included' in a vector"
+                    );
                     assert!(false);
                 }
             }
@@ -330,64 +340,72 @@ fn api_document_collection_from_json_file() {
 
 #[test]
 fn can_deserialize_jsonapi_example_resource_001() {
-    let _ = env_logger::init();
-    let s = ::read_json_file("data/resource_001.json");
+    let _ = env_logger::try_init();
+    let s = crate::read_json_file("data/resource_001.json");
     let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
 
 #[test]
 fn can_deserialize_jsonapi_example_resource_002() {
-    let _ = env_logger::init();
-    let s = ::read_json_file("data/resource_002.json");
+    let _ = env_logger::try_init();
+    let s = crate::read_json_file("data/resource_002.json");
     let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
 
 #[test]
 fn can_deserialize_jsonapi_example_resource_003() {
-    let _ = env_logger::init();
-    let s = ::read_json_file("data/resource_003.json");
+    let _ = env_logger::try_init();
+    let s = crate::read_json_file("data/resource_003.json");
+    let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
+    assert!(data.is_ok());
+}
+
+#[test]
+fn can_deserialize_jsonapi_example_resource_004() {
+    let _ = env_logger::try_init();
+    let s = ::read_json_file("data/resource_004.json");
     let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
 
 #[test]
 fn can_deserialize_jsonapi_example_compound_document() {
-    let _ = env_logger::init();
-    let s = ::read_json_file("data/compound_document.json");
+    let _ = env_logger::try_init();
+    let s = crate::read_json_file("data/compound_document.json");
     let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
 
 #[test]
 fn can_deserialize_jsonapi_example_links_001() {
-    let _ = env_logger::init();
-    let s = ::read_json_file("data/links_001.json");
+    let _ = env_logger::try_init();
+    let s = crate::read_json_file("data/links_001.json");
     let data: Result<Links, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
 
 #[test]
 fn can_deserialize_jsonapi_example_links_002() {
-    let _ = env_logger::init();
-    let s = ::read_json_file("data/links_002.json");
+    let _ = env_logger::try_init();
+    let s = crate::read_json_file("data/links_002.json");
     let data: Result<Links, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
 
 #[test]
 fn can_deserialize_jsonapi_example_jsonapi_info() {
-    let _ = env_logger::init();
-    let s = ::read_json_file("data/jsonapi_info_001.json");
+    let _ = env_logger::try_init();
+    let s = crate::read_json_file("data/jsonapi_info_001.json");
     let data: Result<JsonApiInfo, serde_json::Error> = serde_json::from_str(&s);
     assert!(data.is_ok());
 }
 
 #[test]
 fn can_get_attribute() {
-    let _ = env_logger::init();
-    let s = ::read_json_file("data/resource_all_attributes.json");
+    let _ = env_logger::try_init();
+    let s = crate::read_json_file("data/resource_all_attributes.json");
     let data: Result<Resource, serde_json::Error> = serde_json::from_str(&s);
     match data {
         Err(_) => assert!(false),
@@ -448,9 +466,9 @@ fn can_get_attribute() {
 
 #[test]
 fn can_diff_resource() {
-    let _ = env_logger::init();
-    let s1 = ::read_json_file("data/resource_post_001.json");
-    let s2 = ::read_json_file("data/resource_post_002.json");
+    let _ = env_logger::try_init();
+    let s1 = crate::read_json_file("data/resource_post_001.json");
+    let s2 = crate::read_json_file("data/resource_post_002.json");
 
     let data1: Result<Resource, serde_json::Error> = serde_json::from_str(&s1);
     let data2: Result<Resource, serde_json::Error> = serde_json::from_str(&s2);
@@ -479,7 +497,7 @@ fn can_diff_resource() {
 
 #[test]
 fn it_omits_empty_document_and_primary_data_keys() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let resource = Resource {
         _type: "test".into(),
         id: "123".into(),
@@ -491,8 +509,10 @@ fn it_omits_empty_document_and_primary_data_keys() {
         ..Default::default()
     };
 
-    assert_eq!(serde_json::to_string(&doc).unwrap(),
-        r#"{"data":{"type":"test","id":"123","attributes":{}}}"#);
+    assert_eq!(
+        serde_json::to_string(&doc).unwrap(),
+        r#"{"data":{"type":"test","id":"123","attributes":{}}}"#
+    );
 }
 
 #[test]
@@ -507,7 +527,7 @@ fn it_does_not_omit_an_empty_primary_data() {
 
 #[test]
 fn it_omits_empty_error_keys() {
-    let error = JsonApiError{
+    let error = JsonApiError {
         id: Some("error_id".to_string()),
         ..Default::default()
     };
@@ -515,13 +535,15 @@ fn it_omits_empty_error_keys() {
         errors: Some(vec![error]),
         ..Default::default()
     };
-    assert_eq!(serde_json::to_string(&doc).unwrap(),
-        r#"{"errors":[{"id":"error_id"}]}"#);
+    assert_eq!(
+        serde_json::to_string(&doc).unwrap(),
+        r#"{"errors":[{"id":"error_id"}]}"#
+    );
 }
 
 #[test]
 fn it_allows_for_optional_attributes() {
-    let _ = env_logger::init();
+    let _ = env_logger::try_init();
     let serialized = r#"{
             "data" : {
                 "id" :"1", "type" : "post", "relationships" : {}, "links" : {}

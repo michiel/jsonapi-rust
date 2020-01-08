@@ -1,36 +1,15 @@
 language: rust
 rust:
-  - stable
-  - beta
-  - nightly
+- stable
+- beta
+- nightly
 matrix:
   allow_failures:
-    - rust: nightly
-
-before_install:
-  - sudo apt-get update
-
-addons:
-  apt:
-    packages:
-      - libcurl4-openssl-dev
-      - libelf-dev
-      - libdw-dev
-      - cmake
-      - gcc
-      - binutils-dev
-
-after_success: |
-  wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
-  tar xzf master.tar.gz &&
-  cd kcov-master &&
-  mkdir build &&
-  cd build &&
-  cmake .. &&
-  make &&
-  sudo make install &&
-  cd ../.. &&
-  rm -rf kcov-master &&
-  for file in `ls target/debug/*_*-* | grep -v \.d$`; do mkdir -p "target/cov/$(basename $file)"; kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file"; done &&
-  bash <(curl -s https://codecov.io/bash) &&
-  echo "Uploaded code coverage"
+  - rust: nightly
+deploy:
+  provider: cargo
+  condition: $TRAVIS_RUST_VERSION = stable
+  token:
+    secure: pJiAM/156C/ZSHUkwcG8DbsbZMeaJD8Wj2EOLCeXpCBJptAdbE4csircY36SaKp0AQrGWfAZsmJRALSwdjV7TUjsnUsMiGfKjiWlEzYrRIqP4Tc4lKnToPt0NWgauV2fFEhzXYDFppKwob4AbW87GzJdfPnijL+Yyg9KQTh4KcKs5nWaxBBdZhiQGR05Ciqnlady9t0qmq3keAXzoplT83fvxtkVH1fDMzyxjshsejJ+QG1pTljiPawOvR6P8vkpVArcrwUHh4De5I0/ZKp0ATgfuEqIcL8N+sEg4uAmOlUERhqWGKqslvXs5Mbz/N3ryknLsYo6UOA8CH0WCODb1WKtdCHEspZwKE/woEUaBqhgD994V45v64ea3X9waXRutotGfj1PNSjLDwnj8nbVog+cxNaNXV2OIKvMEE0qplWUZUUxiqmk97IBYYEGL2uv26bHz9YWCJUlVHFiG+nd8XkQ1jB63voRpvgfLMFni4l+BBgQhRs+9qgiiBjcd025gfMcA56uDh4Z4XqijW9DES1CWhs76rhtKNR9ZdH9LXrlS7vXVFrFAW1c9QP3/Ip5hBkQ7KvCuEnf/qC5ALt84/3KethdgDcIvbkIrOzwhFr+Ka+0sPzg+UEZTHgYBMFFFAelyz79Xu93vmf3DnXFw/t8ZAUqTDtGzXEIFIvK1p0=
+  on:
+    tags: true
