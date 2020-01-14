@@ -54,7 +54,7 @@
             "type": "chapters"
           }
         },
-        "author": {
+        "authors": {
           "data": {
             "id": "1",
             "type": "authors"
@@ -91,7 +91,7 @@
             "type": "chapters"
           }
         },
-        "author": {
+        "authors": {
           "data": {
             "id": "1",
             "type": "authors"
@@ -128,7 +128,7 @@
             "type": "chapters"
           }
         },
-        "author": {
+        "authors": {
           "data": {
             "id": "1",
             "type": "authors"
@@ -144,7 +144,7 @@
         "ordering": 1
       },
       "relationships": {
-        "book": {
+        "books": {
           "data": {
             "id": "1",
             "type": "books"
@@ -160,7 +160,7 @@
         "ordering": 2
       },
       "relationships": {
-        "book": {
+        "books": {
           "data": {
             "id": "1",
             "type": "books"
@@ -176,7 +176,7 @@
         "ordering": 3
       },
       "relationships": {
-        "book": {
+        "books": {
           "data": {
             "id": "1",
             "type": "books"
@@ -192,7 +192,7 @@
         "ordering": 1
       },
       "relationships": {
-        "book": {
+        "books": {
           "data": {
             "id": "2",
             "type": "books"
@@ -208,7 +208,7 @@
         "ordering": 2
       },
       "relationships": {
-        "book": {
+        "books": {
           "data": {
             "id": "2",
             "type": "books"
@@ -224,7 +224,7 @@
         "ordering": 3
       },
       "relationships": {
-        "book": {
+        "books": {
           "data": {
             "id": "2",
             "type": "books"
@@ -240,7 +240,7 @@
         "ordering": 1
       },
       "relationships": {
-        "book": {
+        "books": {
           "data": {
             "id": "3",
             "type": "books"
@@ -256,7 +256,7 @@
         "ordering": 2
       },
       "relationships": {
-        "book": {
+        "books": {
           "data": {
             "id": "3",
             "type": "books"
@@ -272,7 +272,7 @@
         "ordering": 3
       },
       "relationships": {
-        "book": {
+        "books": {
           "data": {
             "id": "3",
             "type": "books"
