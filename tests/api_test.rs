@@ -552,3 +552,84 @@ fn it_allows_for_optional_attributes() {
     let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(serialized);
     assert_eq!(data.is_ok(), true);
 }
+
+#[test]
+fn it_validates_partialeq_when_compariing_documents() {
+    let _ = env_logger::try_init();
+    let document1 = r#"
+        {
+            "data": {
+              "type": "posts",
+              "id": "1",
+              "attributes": {
+                "title": "Rails is Omakase"
+              },
+              "relationships": {
+                "author": {
+                  "links": {
+                    "self": "/posts/1/relationships/author",
+                    "related": "/posts/1/author"
+                  },
+                  "data": {
+                      "type": "people",
+                      "id": "9"
+                  }
+                },
+                "tags": {
+                  "links": {
+                    "self": "/posts/1/relationships/tags",
+                    "related": "/posts/1/tags"
+                  },
+                  "data": {
+                      "type": "tags",
+                      "id": "99"
+                  }
+                }
+              },
+              "links": {
+                "self": "http://example.com/posts/1"
+              }
+            }
+        }"#;
+
+    let document2 = r#"
+        {
+            "data": {
+              "relationships": {
+                "tags": {
+                  "data": {
+                      "type": "tags",
+                      "id": "99"
+                  },
+                  "links": {
+                    "self": "/posts/1/relationships/tags",
+                    "related": "/posts/1/tags"
+                  }
+                },
+                "author": {
+                  "links": {
+                    "self": "/posts/1/relationships/author",
+                    "related": "/posts/1/author"
+                  },
+                  "data": {
+                      "type": "people",
+                      "id": "9"
+                  }
+                }
+              },
+              "links": {
+                "self": "http://example.com/posts/1"
+              },
+              "attributes": {
+                "title": "Rails is Omakase"
+              },
+              "type": "posts",
+              "id": "1"
+            }
+        }"#;
+    let doc1: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(document1);
+    let doc2: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(document2);
+    assert_eq!(doc1.is_ok(), true);
+    assert_eq!(doc2.is_ok(), true);
+    assert!(doc1.unwrap() == doc2.unwrap());
+}

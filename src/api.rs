@@ -36,7 +36,9 @@ pub struct ResourceIdentifier {
     pub id: JsonApiId,
 }
 
-/// JSON-API Resource
+/// Representation of a JSON:API resource. This is a struct that contains
+/// attributes that map to the JSON:API specification of `id`, `type`,
+/// `attributes`, `relationships`, `links`, and `meta`
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct Resource {
     #[serde(rename = "type")]

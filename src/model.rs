@@ -29,6 +29,8 @@ where
     #[doc(hidden)]
     fn build_included(&self) -> Option<Resources>;
 
+    /// Create an instance of the struct from a
+    /// [`Resource`](../api/struct.Resource.html)
     fn from_jsonapi_resource(resource: &Resource, included: &Option<Resources>)
         -> Result<Self>
     {
@@ -36,6 +38,11 @@ where
         Self::from_serializable(Self::resource_to_attrs(resource, included))
     }
 
+    /// Create a single resource object or collection of resource
+    /// objects directly from a
+    /// [`JsonApiDocument`](../api/struct.JsonApiDocument.html). This method
+    /// will parse the document (the `data` and `included` resources) in an
+    /// attempt to instantiate the calling struct.
     fn from_jsonapi_document(doc: &JsonApiDocument) -> Result<Self> {
         match doc.data.as_ref() {
             Some(primary_data) => {
@@ -57,6 +64,8 @@ where
         }
     }
 
+    /// Converts the instance of the struct into a
+    /// [`Resource`](../api/struct.Resource.html)
     fn to_jsonapi_resource(&self) -> (Resource, Option<Resources>) {
         if let Value::Object(mut attrs) = to_value(self).unwrap() {
             let _ = attrs.remove("id");
@@ -75,6 +84,8 @@ where
     }
 
 
+    /// Converts the struct into a complete
+    /// [`JsonApiDocument`](../api/struct.JsonApiDocument.html)
     fn to_jsonapi_document(&self) -> JsonApiDocument {
         let (resource, included) = self.to_jsonapi_resource();
         JsonApiDocument {
@@ -141,6 +152,10 @@ where
         flattened
     }
 
+    /// When passed a `ResourceIdentifier` (which contains a `type` and `id`)
+    /// this will iterate through the collection provided `haystack` in an
+    /// attempt to find and return the `Resource` whose `type` and `id`
+    /// attributes match
     #[doc(hidden)]
     fn lookup<'a>(needle: &ResourceIdentifier, haystack: &'a [Resource])
         -> Option<&'a Resource>
@@ -153,6 +168,10 @@ where
         None
     }
 
+    /// Return a [`ResourceAttributes`](../api/struct.ResourceAttributes.html)
+    /// object that contains the attributes in this `resource`. This will be
+    /// called recursively for each `relationship` on the resource in an attempt
+    /// to satisfy the properties for the calling struct.
     #[doc(hidden)]
     fn resource_to_attrs(resource: &Resource, included: &Option<Resources>)
         -> ResourceAttributes

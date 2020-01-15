@@ -100,6 +100,10 @@
 //! assert_eq!(data.is_ok(), true);
 //! ```
 //!
+//! [`JsonApiDocument`][JsonApiDocument] implements `PartialEq` which allows two
+//! documents to be compared for equality. If two documents possess the **same
+//! contents** the ordering of the attributes and fields within the JSONAPI
+//! document are irrelevant and their equality will be `true`.
 //!
 //! ## Testing
 //!
