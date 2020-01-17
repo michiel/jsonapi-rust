@@ -8,7 +8,7 @@ from-latest-tag = true
 [sections]
 Features = ["feat", "feature"]
 Bugfixes = ["bug", "bugs", "bugfix"]
-# Documentation = ["doc", "docs"]
-# Tests = ["test", "tests"]
+Documentation = ["doc", "docs"]
+Tests = ["test", "tests"]
 # Non-Functional = ["refactor"]
 
