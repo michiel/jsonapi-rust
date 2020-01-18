@@ -1,3 +1,14 @@
+<a name="0.6.6"></a>
+##  (2020-01-17)
+
+#### Tests
+
+*   Add test to demonstrate `PartialEq` ([d24db4f2](https://github.com/michiel/jsonapi-rust/commit/d24db4f2704f738527b0485b6844fb51543e5e6d))
+
+#### Documentation
+
+*   Update documentation throughout repository with examples ([c8c51059](https://github.com/michiel/jsonapi-rust/commit/c8c51059b533dd413c2deaa89725b22b435e6cf2))
+
 <a name="0.6.5"></a>
 ## 0.6.5 (2019-11-23)
 
