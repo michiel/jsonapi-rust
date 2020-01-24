@@ -6,95 +6,111 @@ extern crate serde_json;
 use jsonapi::array::JsonApiArray;
 use jsonapi::model::*;
 
-#[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Dog {
-    id: String,
-    name: String,
-    age: i32,
-    main_flea: Flea,
-    fleas: Vec<Flea>,
-}
-jsonapi_model!(Dog; "dog"; has one main_flea; has many fleas);
+mod helper;
+use helper::read_json_file;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
-struct Flea {
+struct Author {
     id: String,
     name: String,
+    books: Vec<Book>,
 }
-jsonapi_model!(Flea; "flea");
+jsonapi_model!(Author; "authors"; has many books);
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct Book {
+    id: String,
+    title: String,
+    first_chapter: Chapter,
+    chapters: Vec<Chapter>
+}
+jsonapi_model!(Book; "books"; has one first_chapter; has many chapters);
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct Chapter {
+    id: String,
+    title: String,
+    ordering: i32,
+}
+jsonapi_model!(Chapter; "chapters");
 
 #[test]
 fn to_jsonapi_document_and_back() {
-    let dog = Dog {
+    let book = Book {
         id: "1".into(),
-        name: "fido".into(),
-        age: 2,
-        main_flea: Flea {
-            id: "1".into(),
-            name: "general flea".into(),
-        },
-        fleas: vec![
-            Flea {
-                id: "2".into(),
-                name: "rick".into(),
-            },
-            Flea {
-                id: "3".into(),
-                name: "morty".into(),
-            },
+        title: "The Fellowship of the Ring".into(),
+        first_chapter: Chapter { id: "1".into(), title: "A Long-expected Party".into(), ordering: 1 },
+        chapters: vec![
+            Chapter { id: "1".into(), title: "A Long-expected Party".into(), ordering: 1 },
+            Chapter { id: "2".into(), title: "The Shadow of the Past".into(), ordering: 2 },
+            Chapter { id: "3".into(), title: "Three is Company".into(), ordering: 3 }
         ],
     };
-    let doc = dog.to_jsonapi_document();
-    let json = serde_json::to_string(&doc).unwrap();
-    println!("JSON IS:");
-    let dog_doc: JsonApiDocument = serde_json::from_str(&json).expect(
-        "Dog JsonApiDocument should be created from the dog json",
-    );
-    let dog_again =
-        Dog::from_jsonapi_document(&dog_doc).expect("Dog should be generated from the dog_doc");
 
-    assert_eq!(dog, dog_again);
+    let doc = book.to_jsonapi_document();
+    let json = serde_json::to_string(&doc).unwrap();
+    let book_doc: JsonApiDocument = serde_json::from_str(&json)
+        .expect("Book JsonApiDocument should be created from the book json");
+    let book_again = Book::from_jsonapi_document(&book_doc)
+        .expect("Book should be generated from the book_doc");
+
+    assert_eq!(book, book_again);
 }
 
 #[test]
 fn numeric_id() {
     #[derive(Debug, PartialEq, Serialize, Deserialize)]
-    struct NumericFlea {
+    struct NumericChapter {
         id: i32,
-        name: String,
+        title: String,
     }
-    jsonapi_model!(NumericFlea; "numeric_flea");
+    jsonapi_model!(NumericChapter; "numeric_chapter");
 
-    let flea = NumericFlea {
-        id: 2,
-        name: "rick".into(),
+    let chapter = NumericChapter {
+        id: 24,
+        title: "The Riders of Rohan".into(),
     };
-    let (res, _) = flea.to_jsonapi_resource();
-    assert_eq!(res.id, "2".to_string());
-    let doc = flea.to_jsonapi_document();
+
+    let (res, _) = chapter.to_jsonapi_resource();
+    assert_eq!(res.id, "24".to_string());
+
+    let doc = chapter.to_jsonapi_document();
     assert!(doc.is_valid());
     assert_eq!(doc.data, Some(PrimaryData::Single(Box::new(res))));
+
     let json = serde_json::to_string(&doc).unwrap();
-    let _num_doc: JsonApiDocument = serde_json::from_str(&json).expect(
-        "NumericFlea JsonApiDocument should be created from the flea json",
-    );
+    let _num_doc: JsonApiDocument = serde_json::from_str(&json)
+        .expect("NumericChapter JsonApiDocument should be created from the chapter json");
 }
 
 #[test]
 fn test_vec_to_jsonapi_document() {
-    let fleas = vec![
-        Flea {
-            id: "2".into(),
-            name: "rick".into(),
+    let chapters = vec![
+        Chapter {
+            id: "45".into(),
+            title: "The Passing of the Grey Company".into(),
+            ordering: 2,
         },
-        Flea {
-            id: "3".into(),
-            name: "morty".into(),
+        Chapter {
+            id: "46".into(),
+            title: "The Muster of Rohan".into(),
+            ordering: 3,
         },
     ];
-    let doc = vec_to_jsonapi_document(fleas);
+
+    let doc = vec_to_jsonapi_document(chapters);
     assert!(doc.is_valid());
 }
 
 #[test]
-fn from_jsonapi_document_and_back() {}
+fn from_jsonapi_document() {
+    let json = ::read_json_file("data/author_tolkien.json");
+
+    let author_doc: JsonApiDocument = serde_json::from_str(&json)
+        .expect("Author JsonApiDocument should be created from the author json");
+    let author = Author::from_jsonapi_document(&author_doc)
+        .expect("Author should be generated from the author_doc");
+
+    let doc_again = author.to_jsonapi_document();
+    assert!(doc_again.is_valid());
+}

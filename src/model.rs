@@ -29,13 +29,12 @@ where
     #[doc(hidden)]
     fn build_included(&self) -> Option<Resources>;
 
-    /// Create an instance of the struct from a
-    /// [`Resource`](../api/struct.Resource.html)
     fn from_jsonapi_resource(resource: &Resource, included: &Option<Resources>)
         -> Result<Self>
     {
 
-        Self::from_serializable(Self::resource_to_attrs(resource, included))
+        let visited_relationships: Vec<&str> = Vec::new();
+        Self::from_serializable(Self::resource_to_attrs(resource, included, &visited_relationships))
     }
 
     /// Create a single resource object or collection of resource
@@ -52,9 +51,10 @@ where
                         Self::from_jsonapi_resource(resource, &doc.included)
                     }
                     PrimaryData::Multiple(ref resources) => {
+                        let visited_relationships: Vec<&str> = Vec::new();
                         let all: Vec<ResourceAttributes> = resources
                             .iter()
-                            .map(|r| Self::resource_to_attrs(r, &doc.included))
+                            .map(|r| Self::resource_to_attrs(r, &doc.included, &visited_relationships))
                             .collect();
                         Self::from_serializable(all)
                     }
@@ -172,30 +172,60 @@ where
     /// object that contains the attributes in this `resource`. This will be
     /// called recursively for each `relationship` on the resource in an attempt
     /// to satisfy the properties for the calling struct.
+    ///
+    /// The last parameter in this function call is `visited_relationships` which is used as this
+    /// function is called recursively. This `Vec` contains the JSON:API `relationships` that were
+    /// visited when this function was called last. When operating on the root node of the document
+    /// this is simply started with an empty `Vec`.
+    ///
+    /// Tracking these "visited" relationships is necessary to prevent infinite recursion and stack
+    /// overflows. This situation can arise when the "included" resource object includes the parent
+    /// resource object - it will simply ping pong back and forth unable to acheive a finite
+    /// resolution.
+    ///
+    /// The JSON:API specification doesn't communicate the direction of a relationship.
+    /// Furthermore the current implementation of this crate does not establish an object graph
+    /// that could be used to traverse these relationships effectively.
     #[doc(hidden)]
-    fn resource_to_attrs(resource: &Resource, included: &Option<Resources>)
+    fn resource_to_attrs(resource: &Resource, included: &Option<Resources>, visited_relationships: &Vec<&str>)
         -> ResourceAttributes
     {
         let mut new_attrs = HashMap::new();
         new_attrs.clone_from(&resource.attributes);
         new_attrs.insert("id".into(), resource.id.clone().into());
 
+        // Copy the contents of `visited_relationships` so that we can mutate within the lexical
+        // scope of this function call. This is also important so each edge that we follow (the
+        // relationship) is not polluted by data from traversing sibling relationships
+        let mut this_visited: Vec<&str> = Vec::new();
+        for rel in visited_relationships.iter() {
+            this_visited.push(rel);
+        }
+
         if let Some(relations) = resource.relationships.as_ref() {
             if let Some(inc) = included.as_ref() {
                 for (name, relation) in relations {
+                    // If we have already visited this resource object, exit early and do not
+                    // recurse through the relations
+                    if this_visited.contains(&name.as_str()) {
+                        return new_attrs;
+                    }
+                    // Track that we have visited this relationship to avoid infinite recursion
+                    this_visited.push(name);
+
                     let value = match relation.data {
                         Some(IdentifierData::None) => Value::Null,
                         Some(IdentifierData::Single(ref identifier)) => {
                             let found = Self::lookup(identifier, inc)
-                                .map(|r| Self::resource_to_attrs(r, included) );
+                                .map(|r| Self::resource_to_attrs(r, included, &this_visited) );
                             to_value(found)
                                 .expect("Casting Single relation to value")
                         },
                         Some(IdentifierData::Multiple(ref identifiers)) => {
                             let found: Vec<Option<ResourceAttributes>> =
-                                identifiers.iter().map(|id|{
-                                    Self::lookup(id, inc).map(|r|{
-                                        Self::resource_to_attrs(r, included)
+                                identifiers.iter().map(|identifier|{
+                                    Self::lookup(identifier, inc).map(|r|{
+                                        Self::resource_to_attrs(r, included, &this_visited)
                                     })
                                 }).collect();
                             to_value(found)
@@ -207,7 +237,6 @@ where
                 }
             }
         }
-
         new_attrs
     }
 
