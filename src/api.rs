@@ -81,9 +81,22 @@ pub enum IdentifierData {
     Multiple(ResourceIdentifiers),
 }
 
-/// The specification refers to this as a top-level `document`
+/// A struct that defines an error state for a document
+/// Per the v1.0 spec a document may not contain `errors` and `data`
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-pub struct JsonApiDocument {
+pub struct DocumentError {
+    pub errors: JsonApiErrors,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub links: Option<Links>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub meta: Option<Meta>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub jsonapi: Option<JsonApiInfo>,
+}
+
+/// A struct that defines the valid state when the document does not contain errors
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+pub struct DocumentData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<PrimaryData>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -93,9 +106,17 @@ pub struct JsonApiDocument {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub meta: Option<Meta>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub errors: Option<JsonApiErrors>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub jsonapi: Option<JsonApiInfo>,
+}
+
+/// Use an enum to create the primitive types of JSONAPI documents. Errors and data cannot mutually
+/// co-exist. Rely on Rust's type system to handle this validation instead of testing attributes in
+/// the JsonApiDocument
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[serde(untagged)]
+pub enum JsonApiDocument {
+    Error(DocumentError),
+    Data(DocumentData),
 }
 
 /// Error location
@@ -174,13 +195,9 @@ impl PatchSet {
     }
 }
 
-/// Top-level JSON-API Document
-impl JsonApiDocument {
-    fn has_errors(&self) -> bool {
-        self.errors.is_some()
-    }
+impl DocumentData {
     fn has_meta(&self) -> bool {
-        self.errors.is_some()
+        self.meta.is_some()
     }
     fn has_included(&self) -> bool {
         self.included.is_some()
@@ -188,6 +205,11 @@ impl JsonApiDocument {
     fn has_data(&self) -> bool {
         self.data.is_some()
     }
+}
+
+/// Top-level JSON-API Document
+/// An "error" document can be valid, just as a "data" document can be valid
+impl JsonApiDocument {
     /// This function returns `false` if the `JsonApiDocument` contains any violations of the
     /// specification. See `DocumentValidationError`
     ///
@@ -233,26 +255,25 @@ impl JsonApiDocument {
     /// }
     /// ```
     pub fn validate(&self) -> Option<Vec<DocumentValidationError>> {
-
         let mut errors = Vec::<DocumentValidationError>::new();
+        println!("{:#?}", self);
 
-        if self.has_data() && self.has_errors() {
-            errors.push(DocumentValidationError::DataWithErrors);
+        match self {
+            JsonApiDocument::Error(_x) => None,
+            JsonApiDocument::Data(doc) => {
+                if doc.has_included() && !doc.has_data() {
+                    errors.push(DocumentValidationError::IncludedWithoutData);
+                }
+
+                if !(doc.has_data() || doc.has_meta()) {
+                    errors.push(DocumentValidationError::MissingContent);
+                }
+                match errors.len() {
+                    0 => None,
+                    _ => Some(errors),
+                }
+            }
         }
-
-        if self.has_included() && !self.has_data() {
-            errors.push(DocumentValidationError::IncludedWithoutData);
-        }
-
-        if !(self.has_data() || self.has_meta() || self.has_errors()) {
-            errors.push(DocumentValidationError::MissingContent);
-        }
-
-        match errors.len() {
-            0 => None,
-            _ => Some(errors),
-        }
-
     }
 }
 
@@ -458,7 +479,6 @@ impl Relationship {
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub enum DocumentValidationError {
     IncludedWithoutData,
-    DataWithErrors,
     MissingContent,
 }
 
