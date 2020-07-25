@@ -81,8 +81,7 @@ pub enum IdentifierData {
     Multiple(ResourceIdentifiers),
 }
 
-/// A struct that defines an error state for a document
-/// Per the v1.0 spec a document may not contain `errors` and `data`
+/// A struct that defines an error state for a JSON:API document
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct DocumentError {
     pub errors: JsonApiErrors,
@@ -94,7 +93,7 @@ pub struct DocumentError {
     pub jsonapi: Option<JsonApiInfo>,
 }
 
-/// A struct that defines the valid state when the document does not contain errors
+/// A struct that defines properties for a JSON:API document that contains no errors
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct DocumentData {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -109,9 +108,9 @@ pub struct DocumentData {
     pub jsonapi: Option<JsonApiInfo>,
 }
 
-/// Use an enum to create the primitive types of JSONAPI documents. Errors and data cannot mutually
-/// co-exist. Rely on Rust's type system to handle this validation instead of testing attributes in
-/// the JsonApiDocument
+/// An enum that defines the possible composition of a JSON:API document - one which contains `error` or
+/// `data` - but not both.  Rely on Rust's type system to handle this basic validation instead of
+/// running validators on parsed documents
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
 pub enum JsonApiDocument {
@@ -126,8 +125,7 @@ pub struct ErrorSource {
     pub parameter: Option<String>,
 }
 
-/// JSON-API Error
-/// All fields are optional
+/// Retpresentation of a JSON:API error (all fields are optional)
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct JsonApiError {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -211,7 +209,7 @@ impl DocumentData {
 /// An "error" document can be valid, just as a "data" document can be valid
 impl JsonApiDocument {
     /// This function returns `false` if the `JsonApiDocument` contains any violations of the
-    /// specification. See `DocumentValidationError`
+    /// specification. See [`DocumentValidationError`](enum.DocumentValidationError.html)
     ///
     /// The spec dictates that the document must have least one of `data`, `errors` or `meta`.
     /// Of these, `data` and `errors` must not co-exist.
@@ -480,7 +478,7 @@ impl Relationship {
     }
 }
 
-/// Top-level (Document) JSON-API specification violations
+/// Enum to describe top-level JSON:API specification violations
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub enum DocumentValidationError {
     IncludedWithoutData,
