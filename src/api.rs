@@ -216,17 +216,6 @@ impl JsonApiDocument {
     /// The spec dictates that the document must have least one of `data`, `errors` or `meta`.
     /// Of these, `data` and `errors` must not co-exist.
     /// The optional field `included` may only be present if the `data` field is present too.
-    ///
-    /// ```
-    /// use jsonapi::api::{JsonApiDocument, PrimaryData, JsonApiErrors};
-    /// let doc = JsonApiDocument {
-    ///     data: Some(PrimaryData::None),
-    ///     errors: Some(JsonApiErrors::new()),
-    ///     ..Default::default()
-    /// };
-    ///
-    /// assert_eq!(doc.is_valid(), false);
-    /// ```
     pub fn is_valid(&self) -> bool {
         self.validate().is_none()
     }
@@ -235,19 +224,36 @@ impl JsonApiDocument {
     /// `DocumentValidationError`
     ///
     /// ```
-    /// use jsonapi::api::{JsonApiDocument, PrimaryData, JsonApiErrors, DocumentValidationError};
+    /// // Simulate an error where `included` has data but `data` does not
+    /// use jsonapi::api::*;
+    /// use std::str::FromStr;
     ///
-    /// let doc = JsonApiDocument {
-    ///     data: Some(PrimaryData::None),
-    ///     errors: Some(JsonApiErrors::new()),
+    /// let serialized = r#"{
+    ///   "id":"1",
+    ///   "type":"post",
+    ///   "attributes":{
+    ///     "title": "Rails is Omakase",
+    ///     "likes": 250
+    ///   },
+    ///   "relationships":{},
+    ///   "links" :{}
+    /// }"#;
+    ///
+    /// let resource = Resource::from_str(&serialized);
+    ///
+    /// let data = DocumentData {
+    ///     data: None,
+    ///     included: Some(vec![resource.unwrap()]),
     ///     ..Default::default()
     /// };
+    ///
+    /// let doc = JsonApiDocument::Data(data);
     ///
     /// match doc.validate() {
     ///   Some(errors) => {
     ///     assert!(
     ///       errors.contains(
-    ///         &DocumentValidationError::DataWithErrors
+    ///         &DocumentValidationError::IncludedWithoutData
     ///       )
     ///     )
     ///   }
@@ -256,7 +262,6 @@ impl JsonApiDocument {
     /// ```
     pub fn validate(&self) -> Option<Vec<DocumentValidationError>> {
         let mut errors = Vec::<DocumentValidationError>::new();
-        println!("{:#?}", self);
 
         match self {
             JsonApiDocument::Error(_x) => None,
