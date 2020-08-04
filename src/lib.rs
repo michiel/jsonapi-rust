@@ -57,12 +57,12 @@
 //! let resource = example_flea.to_jsonapi_resource();
 //! ```
 //!
-//! ### Deserializing a JSONAPI Document
+//! ### Deserializing a JSON:API Document
 //!
-//! Deserialize a JSONAPI document using [serde] by explicitly declaring the
+//! Deserialize a JSON:API document using [serde] by explicitly declaring the
 //! variable type in `Result`
 //!
-//! ```text
+//! ```rust
 //! let serialized = r#"
 //! {
 //!   "data": [{
@@ -95,14 +95,14 @@
 //! Or parse the `String` directly using the
 //! [Resource::from_str](api/struct.Resource.html) trait implementation
 //!
-//! ```text
+//! ```rust
 //! let data = Resource::from_str(&serialized);
 //! assert_eq!(data.is_ok(), true);
 //! ```
 //!
 //! [`JsonApiDocument`][JsonApiDocument] implements `PartialEq` which allows two
 //! documents to be compared for equality. If two documents possess the **same
-//! contents** the ordering of the attributes and fields within the JSONAPI
+//! contents** the ordering of the attributes and fields within the JSON:API
 //! document are irrelevant and their equality will be `true`.
 //!
 //! ## Testing

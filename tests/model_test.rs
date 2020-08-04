@@ -49,8 +49,8 @@ fn to_jsonapi_document_and_back() {
 
     let doc = book.to_jsonapi_document();
     let json = serde_json::to_string(&doc).unwrap();
-    let book_doc: JsonApiDocument = serde_json::from_str(&json)
-        .expect("Book JsonApiDocument should be created from the book json");
+    let book_doc: DocumentData = serde_json::from_str(&json)
+        .expect("Book DocumentData should be created from the book json");
     let book_again = Book::from_jsonapi_document(&book_doc)
         .expect("Book should be generated from the book_doc");
 
@@ -76,7 +76,12 @@ fn numeric_id() {
 
     let doc = chapter.to_jsonapi_document();
     assert!(doc.is_valid());
-    assert_eq!(doc.data, Some(PrimaryData::Single(Box::new(res))));
+    match &doc {
+        JsonApiDocument::Error(_) => assert!(false),
+        JsonApiDocument::Data(x) => {
+            assert_eq!(x.data, Some(PrimaryData::Single(Box::new(res))));
+        }
+    }
 
     let json = serde_json::to_string(&doc).unwrap();
     let _num_doc: JsonApiDocument = serde_json::from_str(&json)
@@ -106,11 +111,22 @@ fn test_vec_to_jsonapi_document() {
 fn from_jsonapi_document() {
     let json = ::read_json_file("data/author_tolkien.json");
 
+    // TODO - is this the right thing that we want to test? Shold this cast into a JsonApiDocument
+    // and detect if this was a data or an error?
+    // Not sure that we want to immediately cast this into a "data" when we don't know if this isi
+    // valid test file - it could be an error document for all we know... (that is equally valid)
     let author_doc: JsonApiDocument = serde_json::from_str(&json)
-        .expect("Author JsonApiDocument should be created from the author json");
-    let author = Author::from_jsonapi_document(&author_doc)
-        .expect("Author should be generated from the author_doc");
+        .expect("Author DocumentData should be created from the author json");
 
-    let doc_again = author.to_jsonapi_document();
-    assert!(doc_again.is_valid());
+    // This assumes that the fixture we're using is a "valid" document with data
+    match author_doc {
+        JsonApiDocument::Error(_) => assert!(false),
+        JsonApiDocument::Data(doc) => {
+            let author = Author::from_jsonapi_document(&doc)
+                .expect("Author should be generated from the author_doc");
+
+            let doc_again = author.to_jsonapi_document();
+            assert!(doc_again.is_valid());
+        }
+    }
 }

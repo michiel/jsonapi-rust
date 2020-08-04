@@ -38,11 +38,11 @@ where
     }
 
     /// Create a single resource object or collection of resource
-    /// objects directly from a
-    /// [`JsonApiDocument`](../api/struct.JsonApiDocument.html). This method
+    /// objects directly from 
+    /// [`DocumentData`](../api/struct.DocumentData.html). This method
     /// will parse the document (the `data` and `included` resources) in an
     /// attempt to instantiate the calling struct.
-    fn from_jsonapi_document(doc: &JsonApiDocument) -> Result<Self> {
+    fn from_jsonapi_document(doc: &DocumentData) -> Result<Self> {
         match doc.data.as_ref() {
             Some(primary_data) => {
                 match *primary_data {
@@ -88,11 +88,13 @@ where
     /// [`JsonApiDocument`](../api/struct.JsonApiDocument.html)
     fn to_jsonapi_document(&self) -> JsonApiDocument {
         let (resource, included) = self.to_jsonapi_resource();
-        JsonApiDocument {
-            data: Some(PrimaryData::Single(Box::new(resource))),
-            included,
-            ..Default::default()
-        }
+        JsonApiDocument::Data (
+            DocumentData {
+                data: Some(PrimaryData::Single(Box::new(resource))),
+                included,
+                ..Default::default()
+            }
+        )
     }
 
 
@@ -303,11 +305,13 @@ pub fn vec_to_jsonapi_resources<T: JsonApiModel>(
 /// ```
 pub fn vec_to_jsonapi_document<T: JsonApiModel>(objects: Vec<T>) -> JsonApiDocument {
     let (resources, included) = vec_to_jsonapi_resources(objects);
-    JsonApiDocument {
-        data: Some(PrimaryData::Multiple(resources)),
-        included,
-        ..Default::default()
-    }
+    JsonApiDocument::Data (
+        DocumentData {
+            data: Some(PrimaryData::Multiple(resources)),
+            included,
+            ..Default::default()
+        }
+    )
 }
 
 impl<M: JsonApiModel> JsonApiModel for Box<M> {
