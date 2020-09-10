@@ -27,6 +27,8 @@ Examples of most serialization and deserialization cases can be found in the [_t
 
 ## Development
 
+_Note - Until this crate reaches v1.0.0 breaking changes that are not backwards compatible will be announced in the [CHANGELOG](https://github.com/michiel/jsonapi-rust/blob/master/CHANGELOG.md)._
+
 ### Testing
 
 The command `cargo test` will run all tests. For more verbose output or output with _cargo watch_,

@@ -10,5 +10,5 @@ Features = ["feat", "feature"]
 Bugfixes = ["bug", "bugs", "bugfix"]
 Documentation = ["doc", "docs"]
 Tests = ["test", "tests"]
-# Non-Functional = ["refactor"]
+Non-Functional = ["refactor"]
 

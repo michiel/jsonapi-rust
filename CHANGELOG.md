@@ -1,3 +1,26 @@
+<a name="v0.7.0"></a>
+## v0.7.0 (2020-09-10)
+
+#### Bugfixes
+
+*   Fix issue with infinite recursion when instantiating document ([9997a8c0](https://github.com/michiel/jsonapi-rust/commit/9997a8c07e694e93b6abf68673b67a57916d61e9))
+*   replace Dog/Flea with Author/Book/Chapter to expose bug with JsonApiModel::resource_to_attrs and stack overflow error ([9403689e](https://github.com/michiel/jsonapi-rust/commit/9403689e9bd94a34ad93f8a6d027c833adfd8b38))
+
+#### Breaking Changes
+
+*   Document validation using Rust types ([6f782603](https://github.com/michiel/jsonapi-rust/commit/6f7826034376c03e61c179cb2390222f71d8525b))
+*   Update tests to align with new enum changes ([a002d96d](https://github.com/michiel/jsonapi-rust/commit/a002d96d2f21533eacfb645d8b0c1866e27c6f29), breaks [#](https://github.com/michiel/jsonapi-rust/issues/))
+
+#### Non-Functional
+
+*   Fix broken inline documentation tests ([89d07baf](https://github.com/michiel/jsonapi-rust/commit/89d07baf7e4a65d5e23f180bb519c116e52553bc))
+*   Fixes tests/model_test with recent changes ([e8f0d0d8](https://github.com/michiel/jsonapi-rust/commit/e8f0d0d866eb665c85b8b6925cf9e82e91c419fe))
+*   Update tests to align with new enum changes ([a002d96d](https://github.com/michiel/jsonapi-rust/commit/a002d96d2f21533eacfb645d8b0c1866e27c6f29), breaks [#](https://github.com/michiel/jsonapi-rust/issues/))
+
+#### Documentation
+
+*   improve documentation in a few places ([70be409f](https://github.com/michiel/jsonapi-rust/commit/70be409fec545353967a8f6b419efa3ff6795d2c))
+
 <a name="0.6.6"></a>
 ##  (2020-01-17)
 
