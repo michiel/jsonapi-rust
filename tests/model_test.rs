@@ -77,7 +77,7 @@ fn numeric_id() {
     let doc = chapter.to_jsonapi_document();
     assert!(doc.is_valid());
     match &doc {
-        JsonApiDocument::Error(_) => assert!(false),
+        JsonApiDocument::Error(_) => panic!(),
         JsonApiDocument::Data(x) => {
             assert_eq!(x.data, Some(PrimaryData::Single(Box::new(res))));
         }
@@ -120,7 +120,7 @@ fn from_jsonapi_document() {
 
     // This assumes that the fixture we're using is a "valid" document with data
     match author_doc {
-        JsonApiDocument::Error(_) => assert!(false),
+        JsonApiDocument::Error(_) => panic!(),
         JsonApiDocument::Data(doc) => {
             let author = Author::from_jsonapi_document(&doc)
                 .expect("Author should be generated from the author_doc");
@@ -129,4 +129,44 @@ fn from_jsonapi_document() {
             assert!(doc_again.is_valid());
         }
     }
+}
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct NewAuthor {
+    name: String,
+    books: Vec<String>,
+}
+partial_jsonapi_model!(NewAuthor; "authors"; has many books);
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct NewBook {
+    title: String,
+    first_chapter: String,
+    chapters: Vec<String>,
+}
+partial_jsonapi_model!(NewBook; "books"; has one first_chapter; has many chapters);
+
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
+struct NewChapter {
+    title: String,
+    ordering: i32,
+}
+partial_jsonapi_model!(NewChapter; "chapters");
+
+#[test]
+fn to_jsonapi_document_and_back_partial() {
+    let new_book = NewBook {
+        title: "The Fellowship of the Ring".into(),
+        first_chapter: "1".into(),
+        chapters: vec!["1".into(), "2".into(), "3".into()],
+    };
+
+    let doc = new_book.to_jsonapi_document();
+    let json = serde_json::to_string(&doc).unwrap();
+    let new_book_doc: DocumentData = serde_json::from_str(&json)
+        .expect("Book DocumentData should be created from the book json");
+    let new_book_again = NewBook::from_jsonapi_document(&new_book_doc)
+        .expect("NewBook should be generated from the new_book_doc");
+
+    assert_eq!(new_book, new_book_again);
 }

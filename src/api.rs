@@ -1,16 +1,18 @@
 //! Defines custom types and structs primarily that composite the JSON:API
 //! document
-use serde_json;
-use std::collections::HashMap;
 use crate::errors::*;
-use std::str::FromStr;
+use serde_json;
 use std;
+use std::collections::HashMap;
+use std::str::FromStr;
 
 /// Permitted JSON-API values (all JSON Values)
 pub type JsonApiValue = serde_json::Value;
 
 /// Vector of `Resource`
 pub type Resources = Vec<Resource>;
+/// Vector of `PartialResource`
+pub type PartialResources = Vec<PartialResource>;
 /// Vector of `ResourceIdentifiers`
 pub type ResourceIdentifiers = Vec<ResourceIdentifier>;
 pub type Links = HashMap<String, JsonApiValue>;
@@ -54,6 +56,20 @@ pub struct Resource {
     pub meta: Option<Meta>,
 }
 
+/// Representation of a JSON:API resource that lacks an id.
+/// This is a struct that contains attributes that map to the
+/// JSON:API specification of `id`, `type`,
+/// `attributes`, `relationships`, `links`, and `meta`
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+pub struct PartialResource {
+    pub _type: String,
+    pub attributes: ResourceAttributes,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub links: Option<Links>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub relationships: Option<Relationships>,
+}
+
 /// Relationship with another object
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Relationship {
@@ -70,6 +86,8 @@ pub enum PrimaryData {
     None,
     Single(Box<Resource>),
     Multiple(Resources),
+    SinglePartial(Box<PartialResource>),
+    MultiplePartial(PartialResources),
 }
 
 /// Valid Resource Identifier (can be None)
@@ -108,8 +126,9 @@ pub struct DocumentData {
     pub jsonapi: Option<JsonApiInfo>,
 }
 
-/// An enum that defines the possible composition of a JSON:API document - one which contains `error` or
-/// `data` - but not both.  Rely on Rust's type system to handle this basic validation instead of
+/// An enum that defines the possible composition of a JSON:API document - one which contains
+/// `error`, `data` or `partial_data` - but not multiple.
+/// Rely on Rust's type system to handle this basic validation instead of
 /// running validators on parsed documents
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 #[serde(untagged)]
@@ -162,7 +181,6 @@ pub struct Pagination {
     pub next: Option<String>,
     pub last: Option<String>,
 }
-
 
 #[derive(Debug)]
 pub struct Patch {

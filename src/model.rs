@@ -409,3 +409,197 @@ macro_rules! jsonapi_model {
         }
     );
 }
+
+/// A trait for any struct that can be converted from/into a
+/// [`PartialResource`](api/struct.PartialResource.tml). The only requirement is
+/// that your struct does not have a `id: String` field.
+/// You shouldn't be implementing PartialJsonApiModel manually, look at the
+/// `jsonapi_model!` macro instead.
+pub trait PartialJsonApiModel: Serialize
+where
+    for<'de> Self: Deserialize<'de>,
+{
+    #[doc(hidden)]
+    fn jsonapi_type(&self) -> String;
+    #[doc(hidden)]
+    fn relationship_fields() -> Option<&'static [&'static str]>;
+    #[doc(hidden)]
+    fn build_relationships(&self) -> Option<Relationships>;
+
+    fn from_partial_jsonapi_resource(resource: &PartialResource) -> Result<Self> {
+        Self::from_serializable(Self::partial_resource_to_attrs(resource))
+    }
+
+    fn from_jsonapi_document(doc: &DocumentData) -> Result<Self> {
+        match doc.data.as_ref() {
+            Some(primary_data) => match *primary_data {
+                PrimaryData::None => bail!("Document had no data"),
+                PrimaryData::Single(_) => unimplemented!(),
+                PrimaryData::Multiple(_) => unimplemented!(),
+                PrimaryData::SinglePartial(ref resource) => {
+                    Self::from_partial_jsonapi_resource(resource)
+                }
+                PrimaryData::MultiplePartial(ref resources) => {
+                    let all: Vec<ResourceAttributes> = resources
+                        .iter()
+                        .map(|r| Self::partial_resource_to_attrs(r))
+                        .collect();
+                    Self::from_serializable(all)
+                }
+            },
+            None => error_chain::bail!("Document had no data"),
+        }
+    }
+
+    fn to_partial_jsonapi_resource(&self) -> PartialResource {
+        if let Value::Object(attrs) = to_value(self).unwrap() {
+            PartialResource {
+                _type: self.jsonapi_type(),
+                relationships: self.build_relationships(),
+                attributes: Self::extract_attributes(&attrs),
+                ..Default::default()
+            }
+        } else {
+            panic!(format!("{} is not a Value::Object", self.jsonapi_type()))
+        }
+    }
+
+    fn to_jsonapi_document(&self) -> JsonApiDocument {
+        let partial_resource = self.to_partial_jsonapi_resource();
+        JsonApiDocument::Data(DocumentData {
+            data: Some(PrimaryData::SinglePartial(Box::new(partial_resource))),
+            ..Default::default()
+        })
+    }
+
+    #[doc(hidden)]
+    fn build_has_one(_type: &str, id: &str) -> Relationship {
+        Relationship {
+            data: Some(IdentifierData::Single(ResourceIdentifier {
+                _type: _type.to_string(),
+                id: id.to_string(),
+            })),
+            links: None,
+        }
+    }
+
+    #[doc(hidden)]
+    fn build_has_many(_type: &str, ids: &[String]) -> Relationship {
+        Relationship {
+            data: Some(IdentifierData::Multiple(
+                ids.iter()
+                    .map(|id| ResourceIdentifier {
+                        _type: _type.to_string(),
+                        id: id.to_string(),
+                    })
+                    .collect(),
+            )),
+            links: None,
+        }
+    }
+
+    #[doc(hidden)]
+    fn extract_attributes(attrs: &Map<String, Value>) -> ResourceAttributes {
+        attrs
+            .iter()
+            .filter(|&(key, _)| {
+                if let Some(fields) = Self::relationship_fields() {
+                    if fields.contains(&key.as_str()) {
+                        return false;
+                    }
+                }
+                true
+            })
+            .map(|(k, v)| (k.clone(), v.clone()))
+            .collect()
+    }
+
+    #[doc(hidden)]
+    fn partial_resource_to_attrs(resource: &PartialResource) -> ResourceAttributes {
+        let mut new_attrs = HashMap::new();
+        new_attrs.clone_from(&resource.attributes);
+
+        // Add relationships to new attributes
+        if let Some(relations) = resource.relationships.as_ref() {
+            for (name, relation) in relations {
+                let value = match relation.data {
+                    Some(IdentifierData::None) => Value::Null,
+                    Some(IdentifierData::Single(ref identifier)) => {
+                        to_value(&identifier.id).expect("Casting Single id to value")
+                    }
+                    Some(IdentifierData::Multiple(ref identifiers)) => to_value(
+                        identifiers
+                            .iter()
+                            .map(|identifier| identifier.id.clone())
+                            .collect::<Vec<_>>(),
+                    )
+                    .expect("Casting Multiple relation to value"),
+                    None => Value::Null,
+                };
+                new_attrs.insert(name.to_string(), value);
+            }
+        }
+        new_attrs
+    }
+
+    #[doc(hidden)]
+    fn from_serializable<S: Serialize>(s: S) -> Result<Self> {
+        from_value(to_value(s)?).map_err(Error::from)
+    }
+}
+
+#[macro_export]
+macro_rules! partial_jsonapi_model {
+    ($model:ty; $type:expr) => (
+        impl PartialJsonApiModel for $model {
+            fn jsonapi_type(&self) -> String { $type.to_string() }
+            fn relationship_fields() -> Option<&'static [&'static str]> { None }
+            fn build_relationships(&self) -> Option<Relationships> { None }
+        }
+    );
+    ($model:ty; $type:expr;
+        has one $( $has_one:ident ),*
+    ) => (
+        partial_jsonapi_model!($model; $type; has one $( $has_one ),*; has many);
+    );
+    ($model:ty; $type:expr;
+        has many $( $has_many:ident ),*
+    ) => (
+        partial_jsonapi_model!($model; $type; has one; has many $( $has_many ),*);
+    );
+    ($model:ty; $type:expr;
+        has one $( $has_one:ident ),*;
+        has many $( $has_many:ident ),*
+    ) => (
+        impl PartialJsonApiModel for $model {
+            fn jsonapi_type(&self) -> String { $type.to_string() }
+
+            fn relationship_fields() -> Option<&'static [&'static str]> {
+                static FIELDS: &'static [&'static str] = &[
+                     $( stringify!($has_one),)*
+                     $( stringify!($has_many),)*
+                ];
+
+                Some(FIELDS)
+            }
+
+            fn build_relationships(&self) -> Option<Relationships> {
+                let mut relationships = HashMap::new();
+                $(
+                    relationships.insert(stringify!($has_one).into(),
+                        Self::build_has_one(stringify!($has_one).into(), &self.$has_one.to_string())
+                    );
+                )*
+                $(
+                    relationships.insert(
+                        stringify!($has_many).into(),
+                        {
+                            Self::build_has_many(stringify!($has_many).into(), &self.$has_many.iter().map(ToString::to_string).collect::<Vec<_>>())
+                        }
+                    );
+                )*
+                Some(relationships)
+            }
+        }
+    );
+}
