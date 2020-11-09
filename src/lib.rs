@@ -63,6 +63,10 @@
 //! variable type in `Result`
 //!
 //! ```rust
+//! # #[macro_use] extern crate serde_json;
+//! # #[macro_use] extern crate jsonapi;
+//! # use jsonapi::api::JsonApiDocument;
+//! # use serde_json;
 //! let serialized = r#"
 //! {
 //!   "data": [{
@@ -88,15 +92,7 @@
 //!     }
 //!   ]
 //! }"#;
-//! let data: Result<Resource, serde_json::Error> = serde_json::from_str(&serialized);
-//! assert_eq!(data.is_ok(), true);
-//! ```
-//!
-//! Or parse the `String` directly using the
-//! [Resource::from_str](api/struct.Resource.html) trait implementation
-//!
-//! ```rust
-//! let data = Resource::from_str(&serialized);
+//! let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&serialized);
 //! assert_eq!(data.is_ok(), true);
 //! ```
 //!
