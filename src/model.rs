@@ -1,8 +1,8 @@
 //! Defines the `JsonApiModel` trait. This is primarily used in conjunction with
 //! the [`jsonapi_model!`](../macro.jsonapi_model.html) macro to allow arbitrary
 //! structs which implement `Deserialize` to be converted to/from a
-//! [`JsonApiDocument`](../api/struct.JsonApiDocument.html) or
-//! [`Resource`](../api/struct.Resource.html)
+//! [`JsonApiDocument`](crate::api::JsonApiDocument) or
+//! [`Resource`](crate::api::Resource)
 pub use std::collections::HashMap;
 pub use crate::api::*;
 use crate::errors::*;
@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::{from_value, to_value, Value, Map};
 
 /// A trait for any struct that can be converted from/into a
-/// [`Resource`](api/struct.Resource.tml). The only requirement is that your
+/// [`Resource`](crate::api::Resource). The only requirement is that your
 /// struct has an `id: String` field.
 /// You shouldn't be implementing JsonApiModel manually, look at the
 /// `jsonapi_model!` macro instead.
@@ -249,7 +249,7 @@ where
 }
 
 /// Converts a `vec!` of structs into
-/// [`Resources`](../api/type.Resources.html)
+/// [`Resources`](crate::api::Resources)
 ///
 pub fn vec_to_jsonapi_resources<T: JsonApiModel>(
     objects: Vec<T>,
@@ -274,7 +274,7 @@ pub fn vec_to_jsonapi_resources<T: JsonApiModel>(
 }
 
 /// Converts a `vec!` of structs into a
-/// [`JsonApiDocument`](../api/struct.JsonApiDocument.html)
+/// [`JsonApiDocument`](crate::api::JsonApiDocument)
 ///
 /// ```rust
 /// #[macro_use] extern crate serde_derive;
@@ -337,7 +337,7 @@ impl<M: JsonApiModel> JsonApiModel for Box<M> {
 }
 
 /// When applied this macro implements the
-/// [`JsonApiModel`](model/trait.JsonApiModel.html) trait for the provided type
+/// [`JsonApiModel`](crate::api::JsonApiModel) trait for the provided type
 ///
 #[macro_export]
 macro_rules! jsonapi_model {

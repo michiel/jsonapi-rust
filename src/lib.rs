@@ -25,7 +25,7 @@
 //! ### Basic Usage with Macro
 //!
 //! Using the [`jsonapi_model!`][jsonapi_model] macro a struct can be converted
-//! into a [`JsonApiDocument`][JsonApiDocument] or [`Resource`][Resource]. It is
+//! into a [`JsonApiDocument`][api::JsonApiDocument] or [`Resource`][Resource]. It is
 //! required that the struct have an `id` property whose type is `String`. The
 //! second argument in the [`jsonapi_model!`][jsonapi_model] marco defines the
 //! `type` member as required by the [JSON:API] specification
@@ -63,6 +63,10 @@
 //! variable type in `Result`
 //!
 //! ```rust
+//! # #[macro_use] extern crate serde_json;
+//! # #[macro_use] extern crate jsonapi;
+//! # use jsonapi::api::JsonApiDocument;
+//! # use serde_json;
 //! let serialized = r#"
 //! {
 //!   "data": [{
@@ -88,7 +92,7 @@
 //!     }
 //!   ]
 //! }"#;
-//! let data: Result<Resource, serde_json::Error> = serde_json::from_str(&serialized);
+//! let data: Result<JsonApiDocument, serde_json::Error> = serde_json::from_str(&serialized);
 //! assert_eq!(data.is_ok(), true);
 //! ```
 //!
@@ -96,11 +100,41 @@
 //! [Resource::from_str](api/struct.Resource.html) trait implementation
 //!
 //! ```rust
-//! let data = Resource::from_str(&serialized);
+//! # #[macro_use] extern crate serde_json;
+//! # #[macro_use] extern crate jsonapi;
+//! # use jsonapi::api::JsonApiDocument;
+//! # use serde_json;
+//! # use std::str::FromStr;
+//! let serialized = r#"
+//! {
+//!   "data": [{
+//!     "type": "articles",
+//!     "id": "1",
+//!     "attributes": {
+//!       "title": "JSON:API paints my bikeshed!",
+//!       "body": "The shortest article. Ever."
+//!     },
+//!     "relationships": {
+//!       "author": {
+//!         "data": {"id": "42", "type": "people"}
+//!       }
+//!     }
+//!   }],
+//!   "included": [
+//!     {
+//!       "type": "people",
+//!       "id": "42",
+//!       "attributes": {
+//!         "name": "John"
+//!       }
+//!     }
+//!   ]
+//! }"#;
+//! let data = JsonApiDocument::from_str(&serialized);
 //! assert_eq!(data.is_ok(), true);
 //! ```
 //!
-//! [`JsonApiDocument`][JsonApiDocument] implements `PartialEq` which allows two
+//! [`JsonApiDocument`][api::JsonApiDocument] implements `PartialEq` which allows two
 //! documents to be compared for equality. If two documents possess the **same
 //! contents** the ordering of the attributes and fields within the JSON:API
 //! document are irrelevant and their equality will be `true`.
