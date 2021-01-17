@@ -353,16 +353,17 @@ macro_rules! jsonapi_model {
     ($model:ty; $type:expr;
         has one $( $has_one:ident ),*
     ) => (
-        jsonapi_model!($model; $type; has one $( $has_one ),*; has many);
+        jsonapi_model!($model; $type; has one $( $has_one ),*; has many; has optional);
     );
     ($model:ty; $type:expr;
         has many $( $has_many:ident ),*
     ) => (
-        jsonapi_model!($model; $type; has one; has many $( $has_many ),*);
+        jsonapi_model!($model; $type; has one; has many $( $has_many ),*; has optional);
     );
     ($model:ty; $type:expr;
         has one $( $has_one:ident ),*;
-        has many $( $has_many:ident ),*
+        has many $( $has_many:ident ),*;
+        has optional $( $has_opt:ident ),*
     ) => (
         impl JsonApiModel for $model {
             fn jsonapi_type(&self) -> String { $type.to_string() }
@@ -372,6 +373,7 @@ macro_rules! jsonapi_model {
                 static FIELDS: &'static [&'static str] = &[
                      $( stringify!($has_one),)*
                      $( stringify!($has_many),)*
+                     $( stringify!($has_opt),)*
                 ];
 
                 Some(FIELDS)
@@ -393,12 +395,24 @@ macro_rules! jsonapi_model {
                         }
                     );
                 )*
+                $(
+                    if let Some(model) = &self.$has_opt {
+                        relationships.insert(stringify!($has_opt).into(),
+                            Self::build_has_one(model)
+                        );
+                    }
+                )*
                 Some(relationships)
             }
 
             fn build_included(&self) -> Option<Resources> {
                 let mut included:Resources = vec![];
                 $( included.append(&mut self.$has_one.to_resources()); )*
+                $(
+                    if let Some(resource) = &self.$has_opt {
+                        included.append(&mut resource.to_resources());
+                    }
+                )*
                 $(
                     for model in self.$has_many.get_models() {
                         included.append(&mut model.to_resources());
