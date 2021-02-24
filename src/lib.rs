@@ -62,7 +62,7 @@
 //! Deserialize a JSON:API document using [serde] by explicitly declaring the
 //! variable type in `Result`
 //!
-//! ```rust
+//! ```ignore
 //! let serialized = r#"
 //! {
 //!   "data": [{
@@ -95,7 +95,7 @@
 //! Or parse the `String` directly using the
 //! [Resource::from_str](api/struct.Resource.html) trait implementation
 //!
-//! ```rust
+//! ```ignore
 //! let data = Resource::from_str(&serialized);
 //! assert_eq!(data.is_ok(), true);
 //! ```
