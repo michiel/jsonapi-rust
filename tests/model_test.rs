@@ -21,10 +21,11 @@ jsonapi_model!(Author; "authors"; has many books);
 struct Book {
     id: String,
     title: String,
+    forward: Option<Chapter>,
     first_chapter: Chapter,
     chapters: Vec<Chapter>
 }
-jsonapi_model!(Book; "books"; has one first_chapter; has many chapters);
+jsonapi_model!(Book; "books"; has one first_chapter; has many chapters; has optional forward);
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 struct Chapter {
@@ -39,6 +40,7 @@ fn to_jsonapi_document_and_back() {
     let book = Book {
         id: "1".into(),
         title: "The Fellowship of the Ring".into(),
+        forward: None,
         first_chapter: Chapter { id: "1".into(), title: "A Long-expected Party".into(), ordering: 1 },
         chapters: vec![
             Chapter { id: "1".into(), title: "A Long-expected Party".into(), ordering: 1 },
@@ -53,6 +55,30 @@ fn to_jsonapi_document_and_back() {
         .expect("Book DocumentData should be created from the book json");
     let book_again = Book::from_jsonapi_document(&book_doc)
         .expect("Book should be generated from the book_doc");
+
+    assert_eq!(book, book_again);
+}
+
+#[test]
+fn to_jsonapi_document_and_back_optional() {
+    let book = Book {
+        id: "1".into(),
+        title: "The Fellowship of the Ring".into(),
+        forward: Some(Chapter { id: "0".into(), title: "abc".into(), ordering: 0}),
+        first_chapter: Chapter { id: "1".into(), title: "A Long-expected Party".into(), ordering: 1 },
+        chapters: vec![
+            Chapter { id: "1".into(), title: "A Long-expected Party".into(), ordering: 1 },
+            Chapter { id: "2".into(), title: "The Shadow of the Past".into(), ordering: 2 },
+            Chapter { id: "3".into(), title: "Three is Company".into(), ordering: 3 }
+        ],
+    };
+
+    let doc = book.to_jsonapi_document();
+    let json = serde_json::to_string(&doc).unwrap();
+    let book_doc: DocumentData = serde_json::from_str(&json)
+      .expect("Book DocumentData should be created from the book json");
+    let book_again = Book::from_jsonapi_document(&book_doc)
+      .expect("Book should be generated from the book_doc");
 
     assert_eq!(book, book_again);
 }
